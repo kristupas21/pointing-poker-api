@@ -4,13 +4,11 @@ import helmet from 'helmet';
 import express, { NextFunction, Request, Response } from 'express';
 import StatusCodes from 'http-status-codes';
 import 'express-async-errors';
-import logger from '@shared/Logger';
-import api from '@controllers/index';
+import logger from './global/Logger';
+import api from './controllers/controllers';
 
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
-
-
 
 /************************************************************************************
  *                              Set basic express settings

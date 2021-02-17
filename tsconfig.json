@@ -82,20 +82,20 @@
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
     "paths": {
-      "@daos/*": [
-        "src/daos/*"
+      "@shared-with-ui/*": [
+        "src/shared-with-ui/*"
       ],
-      "@entities/*": [
-        "src/entities/*"
-      ],
-      "@shared/*": [
-        "src/shared/*"
+      "@global/*": [
+        "src/global/*"
       ],
       "@server": [
         "src/Server"
       ],
       "@controllers/*": [
         "src/controllers/*"
+      ],
+      "@database/*": [
+        "src/database/*"
       ]
     },
   },

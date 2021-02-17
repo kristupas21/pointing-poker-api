@@ -19,10 +19,11 @@
     "exec": "ts-node -r tsconfig-paths/register ./src"
   },
   "_moduleAliases": {
-    "@daos": "dist/daos",
-    "@shared": "dist/shared",
+    "@shared-with-ui": "dist/shared-with-ui",
     "@server": "dist/Server",
-    "@controllers": "dist/controllers"
+    "@controllers": "dist/controllers",
+    "@database": "dist/database",
+    "@global": "dist/global"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
@@ -51,7 +52,8 @@
       "@typescript-eslint/no-explicit-any": 0,
       "@typescript-eslint/no-floating-promises": 0,
       "@typescript-eslint/no-unsafe-member-access": 0,
-      "@typescript-eslint/no-unsafe-assignment": 0
+      "@typescript-eslint/no-unsafe-assignment": 0,
+      "@typescript-eslint/no-misused-promises": 0
     }
   },
   "eslintIgnore": [
@@ -69,7 +71,9 @@
     "jet-logger": "1.0.4",
     "jsonfile": "6.1.0",
     "module-alias": "2.2.2",
-    "morgan": "1.10.0"
+    "morgan": "1.10.0",
+    "shortid": "^2.2.16",
+    "socket.io": "3.1.1"
   },
   "devDependencies": {
     "@types/command-line-args": "5.0.0",
