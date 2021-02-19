@@ -8,7 +8,6 @@ export interface User {
 }
 
 export interface WSMessage<T = never> {
-    eventType: string;
     body: T;
 }
 

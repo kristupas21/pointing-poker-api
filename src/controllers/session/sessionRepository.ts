@@ -3,6 +3,11 @@ import { User } from '@shared-with-ui/types';
 import DatabaseRepository, { Database } from '@database/database.repo';
 
 class SessionRepository extends DatabaseRepository {
+    public async getAllSessions(): Promise<SessionDB[]> {
+        const db = await super.openDb();
+        return db.sessions;
+    }
+
     private findSession(db: Database, sessionId: string): SessionDB {
         return db.sessions.find((s) => s.id === sessionId);
     }

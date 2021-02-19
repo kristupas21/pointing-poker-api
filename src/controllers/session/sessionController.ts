@@ -5,11 +5,9 @@ import { User } from '@shared-with-ui/types';
 import { AppRequest } from '@global/types';
 import { JoinSessionParams } from '../session/sessionModel';
 import SessionService from '../session/sessionService';
-import WsService from '../../ws/wsService';
 
 const sessionController = Router();
 const sessionService = new SessionService();
-const wsService = new WsService();
 
 /* Join Session - "POST - api/session/join" */
 sessionController.post('/join', async (req: AppRequest<JoinSessionParams>, res: Response) => {
@@ -45,8 +43,6 @@ sessionController.get('/load/:sessionId', async (req: AppRequest, res: Response)
             error: ERROR_CODES.NOT_FOUND,
         })
     }
-
-    await wsService.sessionJoined(session.id);
 
     return res.status(StatusCodes.OK).json({ session });
 })

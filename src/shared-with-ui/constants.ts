@@ -3,6 +3,5 @@ export const ERROR_CODES = {
     NOT_FOUND: 'error.generic.notFound',
 }
 
-export const WS_EVENTS = {
-    SESSION_JOINED: 'SESSION_JOINED',
-}
+export const WS_USER_JOINED = '@ws/USER_JOINED';
+export const WS_USER_LEFT = '@ws/USER_LEFT';

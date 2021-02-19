@@ -1,30 +1,40 @@
-import { io } from '../index';
-import { createWSTopic } from '@shared-with-ui/functions';
-import { WSBodySessionJoined, WSMessage } from '@shared-with-ui/types';
-import { WS_EVENTS } from '@shared-with-ui/constants';
-import SessionRepository from '@controllers/session/sessionRepository';
-
-const sessionRepository = new SessionRepository();
+import { Socket } from 'socket.io';
+import { WS_USER_JOINED, WS_USER_LEFT } from '@shared-with-ui/constants';
 
 class WsService {
-    private getIo = () => io;
+    private socket: Socket;
 
-    private createTopic = createWSTopic;
+    private sessionId: string;
 
-    public static createMessage<T>(eventType: string, body: T): WSMessage<T> {
-        return {
-            eventType,
-            body,
-        }
+    constructor(socket: Socket, sessionId: string) {
+        this.socket = socket;
+        this.sessionId = sessionId;
     }
 
-    public async sessionJoined (sessionId: string): Promise<void> {
-        const topic = this.createTopic(sessionId);
-        const session = await sessionRepository.getSessionById(sessionId);
-        const message = WsService.createMessage<WSBodySessionJoined>
-            (WS_EVENTS.SESSION_JOINED, { session });
+    private getRoomName(): string {
+        return `pp-room_${this.sessionId}`;
+    }
 
-        this.getIo().emit(topic, message)
+    public init(): void {
+        const roomName = this.getRoomName();
+
+        this.socket.join(roomName);
+
+        this.socket.on(WS_USER_JOINED, (data) => {
+            this.socket.to(roomName).broadcast.emit(WS_USER_JOINED, data);
+        });
+
+        this.socket.on(WS_USER_LEFT, (data) => {
+            this.socket.to(roomName).broadcast.emit(WS_USER_LEFT, data);
+        });
+    }
+
+    public destroy(): void {
+        const roomName = this.getRoomName();
+
+        this.socket.leave(roomName);
+        this.socket = null;
+        this.sessionId = null;
     }
 }
 
