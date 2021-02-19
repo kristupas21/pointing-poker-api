@@ -1,12 +1,11 @@
-import { User } from '@shared-with-ui/types';
+import { UserSchema } from '@controllers/user/userSchema';
 
-export interface SessionDB {
-    id: string;
-    users: User[];
+export interface IdGenerator {
+    generate: () => string;
+    characters: (chars: string) => void;
 }
 
 export interface JoinSessionParams {
     sessionId: string;
-    isObserver?: boolean;
-    user: User;
+    user: UserSchema;
 }

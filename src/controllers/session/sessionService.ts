@@ -1,53 +1,82 @@
-import { JoinSessionParams, SessionDB } from '../session/sessionModel';
-import SessionRepository from '../session/sessionRepository';
-import { User } from '@shared-with-ui/types';
+import { IdGenerator, JoinSessionParams } from '../session/sessionModel';
 import shortid from 'shortid';
+import Session, { SessionSchema } from '@controllers/session/sessionSchema';
+import User, { UserSchema } from '@controllers/user/userSchema';
+import { ID_GEN_ALLOWED_CHARS } from '@global/constants';
 
-type IdGenerator = {
-    generate: () => string;
-    characters: (chars: string) => void;
-}
 
-const idGenerator: IdGenerator = shortid;
-const sessionRepository = new SessionRepository();
-
-idGenerator.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@&')
 
 class SessionService {
-    public static generateSectionId(): string {
-        return idGenerator.generate();
+    private idGenerator: IdGenerator = shortid;
+
+    public constructor() {
+        this.idGenerator.characters(ID_GEN_ALLOWED_CHARS)
     }
 
-    public async joinSession(params: JoinSessionParams): Promise<SessionDB> {
-        const { sessionId, user } = params;
-        const session = await sessionRepository.getSessionById(sessionId);
+    private generateSectionId(): string {
+        return this.idGenerator.generate();
+    }
 
-        if (!session) {
+    public async joinSession(params: JoinSessionParams): Promise<any> {
+        try {
+            const { sessionId, user } = params;
+            const sessionDB =  await Session.findOne({ id: sessionId }).lean();
+
+            if (!sessionDB) {
+                return null;
+            }
+
+            const filter = { id: user.id, registeredSessionId: sessionId };
+            const userParams = { ...user, registeredSessionId: sessionId };
+            const existingUser = await User.findOne(filter).lean();
+
+            if (existingUser) {
+                await User.replaceOne(filter, userParams)
+            } else {
+                const newUser = new User(userParams);
+                await newUser.save();
+            }
+
+            return params.user;
+        } catch {
             return null;
         }
+    }
 
-        const index = session.users.findIndex((u) => u.id === user.id);
+    public async loadSession(sessionId: string): Promise<any> {
+        try {
+            const session = await Session.findOne({ id: sessionId }).lean();
+            const users = await User.find({ registeredSessionId: sessionId }).lean();
 
-        if (index > -1) {
-            await sessionRepository.replaceUser(sessionId, user, index);
-        } else {
-            await sessionRepository.insertUser(sessionId, user);
+            return { ...session, users };
+        } catch {
+            return null;
         }
-
-        return await sessionRepository.getSessionById(sessionId);
     }
 
-    public async loadSession(sessionId: string): Promise<SessionDB> {
-        return await sessionRepository.getSessionById(sessionId);
+    public async startSession(user: UserSchema): Promise<string> {
+        const sessionId = this.generateSectionId();
+        const sessionDB = new Session({
+            id: sessionId,
+        });
+
+        const userDB = new User({
+            ...user,
+            registeredSessionId: sessionId,
+        });
+
+        try {
+            await sessionDB.save();
+            await userDB.save();
+
+            return sessionId;
+        } catch {
+            return null;
+        }
     }
 
-    public async startSession(user: User): Promise<SessionDB> {
-        const sessionId = SessionService.generateSectionId();
-        const session: SessionDB = { id: sessionId, users: [user] };
-
-        await sessionRepository.insertSession(session);
-
-        return session;
+    public async setSessionVoteStatus(sessionId: string, status: boolean): Promise<SessionSchema> {
+        return Session.findOneAndUpdate({ id: sessionId }, { showVotes: status });
     }
 }
 

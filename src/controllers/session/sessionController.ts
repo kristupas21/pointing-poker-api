@@ -1,10 +1,10 @@
 import StatusCodes from 'http-status-codes';
 import { Response, Router } from 'express';
 import { ERROR_CODES } from '@shared-with-ui/constants';
-import { User } from '@shared-with-ui/types';
 import { AppRequest } from '@global/types';
 import { JoinSessionParams } from '../session/sessionModel';
 import SessionService from '../session/sessionService';
+import { UserSchema } from '@controllers/user/userSchema';
 
 const sessionController = Router();
 const sessionService = new SessionService();
@@ -20,9 +20,16 @@ sessionController.post('/join', async (req: AppRequest<JoinSessionParams>, res: 
         });
     }
 
-    const session = await sessionService.joinSession(req.body);
+    const user = await sessionService.joinSession(req.body);
 
-    return res.status(StatusCodes.OK).json({ session });
+    if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+            sessionId, error: ERROR_CODES.NOT_FOUND
+        });
+    }
+
+    return res.status(StatusCodes.OK).json({ user, sessionId });
+
 });
 
 /* Load Session - "GET - api/session/load/:sessionId" */
@@ -40,15 +47,15 @@ sessionController.get('/load/:sessionId', async (req: AppRequest, res: Response)
 
     if (!session) {
         return res.status(StatusCodes.NOT_FOUND).json({
-            error: ERROR_CODES.NOT_FOUND,
-        })
+            sessionId, error: ERROR_CODES.NOT_FOUND
+        });
     }
 
     return res.status(StatusCodes.OK).json({ session });
 })
 
-/* Join Session - "POST - api/session/start" */
-sessionController.post('/start', async (req: AppRequest<User>, res: Response) => {
+/* Start Session - "POST - api/session/start" */
+sessionController.post('/start', async (req: AppRequest<UserSchema>, res: Response) => {
     const { body: user } = req;
 
     if (!user) {
@@ -58,9 +65,15 @@ sessionController.post('/start', async (req: AppRequest<User>, res: Response) =>
         });
     }
 
-    const session = await sessionService.startSession(user);
+    const sessionId = await sessionService.startSession(user);
 
-    return res.status(StatusCodes.CREATED).json({ session });
+    if (!sessionId) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            error: ERROR_CODES.INTERNAL_SERVER,
+        });
+    }
+
+    return res.status(StatusCodes.CREATED).json({ sessionId });
 });
 
 export default sessionController;
