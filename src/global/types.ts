@@ -1,5 +1,3 @@
 import { Request } from 'express';
 
-export interface AppRequest<T = null> extends Request {
-    body: T;
-}
+export type AppRequest<T = null, Q = never> = Request<T, any, any, Q>;

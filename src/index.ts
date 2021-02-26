@@ -22,7 +22,7 @@ const server = app.listen(port, () => {
 export const io = new Server(server, { cors: { origin: '*' } });
 
 io.on('connection', (socket: Socket) => {
-    const sessionId: string = socket.handshake.auth.sessionId;
+    const { sessionId, userId } = socket.handshake.auth;
 
     if (!sessionId) {
         throw new Error('No sessionId');
@@ -32,7 +32,7 @@ io.on('connection', (socket: Socket) => {
 
     wsService.init();
 
-    socket.on('disconnect', () => {
-        wsService.destroy();
+    socket.on('disconnect', async () => {
+        await wsService.destroy(userId);
     })
 })

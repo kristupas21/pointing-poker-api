@@ -1,7 +1,16 @@
 import { Socket } from 'socket.io';
-import { WS_CLEAR_VOTES, WS_HIDE_VOTES, WS_SHOW_VOTES, WS_USER_JOINED, WS_USER_LEFT } from '@shared-with-ui/constants';
+import {
+    WS_CLEAR_VOTES,
+    WS_HIDE_VOTES,
+    WS_SET_USER_VOTE_VALUE,
+    WS_SHOW_VOTES,
+    WS_USER_JOINED,
+    WS_USER_LEFT
+} from './wsConstants';
 import UserService from '@controllers/user/userService';
 import SessionService from '@controllers/session/sessionService';
+import { WSMessage } from './wsModel';
+import { UserSchema } from '@controllers/user/userSchema';
 
 const userService = new UserService();
 const sessionService = new SessionService();
@@ -11,50 +20,74 @@ class WsService {
 
     private sessionId: string;
 
+    private roomName: string;
+
     constructor(socket: Socket, sessionId: string) {
         this.socket = socket;
         this.sessionId = sessionId;
+        this.roomName = this.getRoomName();
     }
 
     private getRoomName(): string {
         return `pp-room_${this.sessionId}`;
     }
 
-    public init(): void {
-        const roomName = this.getRoomName();
-
-        this.socket.join(roomName);
-
-        this.socket.on(WS_USER_JOINED, (data) => {
-            this.socket.to(roomName).broadcast.emit(WS_USER_JOINED, data);
-        });
-
-        this.socket.on(WS_USER_LEFT, async (data) => {
-            this.socket.to(roomName).broadcast.emit(WS_USER_LEFT, data);
-            await userService.removeUser(data.body.user, this.sessionId);
-        });
-
-        this.socket.on(WS_SHOW_VOTES, async (data) => {
-            await sessionService.setSessionVoteStatus(this.sessionId, true);
-            this.socket.to(roomName).broadcast.emit(WS_SHOW_VOTES, data);
-        });
-
-        this.socket.on(WS_HIDE_VOTES, async (data) => {
-            await sessionService.setSessionVoteStatus(this.sessionId, false);
-            this.socket.to(roomName).broadcast.emit(WS_HIDE_VOTES, data);
-        });
-
-        this.socket.on(WS_CLEAR_VOTES, (data) => {
-            this.socket.to(roomName).broadcast.emit(WS_CLEAR_VOTES, data);
-        })
+    private constructWsMessage(body): WSMessage<typeof body> {
+        return { body, sessionId: this.sessionId };
     }
 
-    public destroy(): void {
-        const roomName = this.getRoomName();
+    public init(): void {
+        this.socket.join(this.roomName);
 
-        this.socket.leave(roomName);
+        this.socket.on(WS_USER_JOINED, this.userJoinedListener);
+        this.socket.on(WS_SHOW_VOTES, this.showVotesListener);
+        this.socket.on(WS_HIDE_VOTES, this.hideVotesListener);
+        this.socket.on(WS_CLEAR_VOTES, this.clearVotesListener);
+        this.socket.on(WS_SET_USER_VOTE_VALUE, this.voteValueListener);
+    }
+
+    private userJoinedListener = (message: WSMessage<{ user: UserSchema, sessionId: string }>) => {
+        this.socket.to(this.roomName).broadcast.emit(WS_USER_JOINED, message);
+    }
+
+    private showVotesListener = async (message: WSMessage<void>) => {
+        await sessionService
+            .setSessionVoteStatus(this.sessionId, true);
+
+        this.socket.to(this.roomName).broadcast.emit(WS_SHOW_VOTES, message);
+    };
+
+    private hideVotesListener = async (data: WSMessage<void>) => {
+        await sessionService
+            .setSessionVoteStatus(this.sessionId, false);
+
+        this.socket.to(this.roomName).broadcast.emit(WS_HIDE_VOTES, data);
+    };
+
+    private clearVotesListener = async (data: WSMessage<void>) => {
+        await sessionService.setSessionVoteStatus(this.sessionId, false);
+        await userService.clearAllVoteValues(this.sessionId);
+
+        this.socket.to(this.roomName).broadcast.emit(WS_CLEAR_VOTES, data);
+    };
+
+    private voteValueListener = async (data: WSMessage<{ userId: string; voteValue: string }>) => {
+        await userService
+            .setUserVoteValue(this.sessionId, data.body.userId, data.body.voteValue);
+
+        this.socket.to(this.roomName).broadcast.emit(WS_SET_USER_VOTE_VALUE, data);
+    };
+
+    public async destroy(userId: string): Promise<void> {
+        const userLeftMessage = this.constructWsMessage({ user: { id: userId } });
+
+        await userService.removeUser(this.sessionId, userId);
+
+        this.socket.to(this.roomName).broadcast.emit(WS_USER_LEFT, userLeftMessage);
+        this.socket.leave(this.roomName);
         this.socket = null;
         this.sessionId = null;
+        this.roomName = null;
     }
 }
 

@@ -20,21 +20,22 @@ sessionController.post('/join', async (req: AppRequest<JoinSessionParams>, res: 
         });
     }
 
-    const user = await sessionService.joinSession(req.body);
+    try {
+        const user = await sessionService.joinSession(req.body);
+        return res.status(StatusCodes.OK).json({ user, sessionId });
+    } catch (e) {
+        const status = e?.status || StatusCodes.INTERNAL_SERVER_ERROR;
+        const error = e?.code ? { error: e.code } : e;
 
-    if (!user) {
-        return res.status(StatusCodes.NOT_FOUND).json({
-            sessionId, error: ERROR_CODES.NOT_FOUND
-        });
+        return res.status(status).json(error)
     }
-
-    return res.status(StatusCodes.OK).json({ user, sessionId });
-
 });
 
 /* Load Session - "GET - api/session/load/:sessionId" */
-sessionController.get('/load/:sessionId', async (req: AppRequest, res: Response) => {
+sessionController.get('/load/:sessionId',
+    async (req: AppRequest<{ sessionId: string }, { userId: string }>, res: Response) => {
     const { sessionId } = req.params;
+    const userId = req.query.userId;
 
     if (!sessionId) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -43,20 +44,28 @@ sessionController.get('/load/:sessionId', async (req: AppRequest, res: Response)
         });
     }
 
-    const session = await sessionService.loadSession(sessionId);
+    try {
+        const session = await sessionService.loadSession(sessionId, userId);
 
-    if (!session) {
-        return res.status(StatusCodes.NOT_FOUND).json({
-            sessionId, error: ERROR_CODES.NOT_FOUND
-        });
+        if (!session) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                sessionId, error: ERROR_CODES.NOT_FOUND
+            });
+        }
+
+        return res.status(StatusCodes.OK).json({ session });
+    } catch (e) {
+        const status = e?.status || StatusCodes.INTERNAL_SERVER_ERROR;
+        const error = e?.code ? { error: e.code } : e;
+
+        return res.status(status).json(error)
     }
-
-    return res.status(StatusCodes.OK).json({ session });
 })
 
 /* Start Session - "POST - api/session/start" */
-sessionController.post('/start', async (req: AppRequest<UserSchema>, res: Response) => {
-    const { body: user } = req;
+sessionController.post('/start',
+    async (req: AppRequest<{ user: UserSchema, useRoles: boolean }>, res: Response) => {
+    const { user, useRoles } = req.body;
 
     if (!user) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -65,7 +74,7 @@ sessionController.post('/start', async (req: AppRequest<UserSchema>, res: Respon
         });
     }
 
-    const sessionId = await sessionService.startSession(user);
+    const sessionId = await sessionService.startSession(user, useRoles);
 
     if (!sessionId) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
