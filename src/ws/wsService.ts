@@ -1,11 +1,11 @@
 import { Socket } from 'socket.io';
 import {
-    WS_CLEAR_VOTES,
+    WS_RESET_VOTE_ROUND,
     WS_HIDE_VOTES,
     WS_SET_USER_VOTE_VALUE,
     WS_SHOW_VOTES,
     WS_USER_JOINED,
-    WS_USER_LEFT
+    WS_USER_LEFT, WS_SET_VOTE_ROUND_TOPIC
 } from './wsConstants';
 import UserService from '@controllers/user/userService';
 import SessionService from '@controllers/session/sessionService';
@@ -42,8 +42,9 @@ class WsService {
         this.socket.on(WS_USER_JOINED, this.userJoinedListener);
         this.socket.on(WS_SHOW_VOTES, this.showVotesListener);
         this.socket.on(WS_HIDE_VOTES, this.hideVotesListener);
-        this.socket.on(WS_CLEAR_VOTES, this.clearVotesListener);
+        this.socket.on(WS_RESET_VOTE_ROUND, this.resetVoteRoundListener);
         this.socket.on(WS_SET_USER_VOTE_VALUE, this.voteValueListener);
+        this.socket.on(WS_SET_VOTE_ROUND_TOPIC, this.voteRoundTopicListener);
     }
 
     private userJoinedListener = (message: WSMessage<{ user: UserSchema, sessionId: string }>) => {
@@ -64,11 +65,12 @@ class WsService {
         this.socket.to(this.roomName).broadcast.emit(WS_HIDE_VOTES, data);
     };
 
-    private clearVotesListener = async (data: WSMessage<void>) => {
+    private resetVoteRoundListener = async (data: WSMessage<void>) => {
         await sessionService.setSessionVoteStatus(this.sessionId, false);
+        await sessionService.setSessionTopic(this.sessionId, '');
         await userService.clearAllVoteValues(this.sessionId);
 
-        this.socket.to(this.roomName).broadcast.emit(WS_CLEAR_VOTES, data);
+        this.socket.to(this.roomName).broadcast.emit(WS_RESET_VOTE_ROUND, data);
     };
 
     private voteValueListener = async (data: WSMessage<{ userId: string; voteValue: string }>) => {
@@ -77,6 +79,12 @@ class WsService {
 
         this.socket.to(this.roomName).broadcast.emit(WS_SET_USER_VOTE_VALUE, data);
     };
+
+    private voteRoundTopicListener = async (data: WSMessage<{ topic: string }>) => {
+        await sessionService.setSessionTopic(this.sessionId, data.body.topic);
+
+        this.socket.to(this.roomName).broadcast.emit(WS_SET_VOTE_ROUND_TOPIC, data);
+    }
 
     public async destroy(userId: string): Promise<void> {
         const userLeftMessage = this.constructWsMessage({ user: { id: userId } });

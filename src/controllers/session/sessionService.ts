@@ -80,8 +80,23 @@ class SessionService {
         }
     }
 
-    public async setSessionVoteStatus(sessionId: string, status: boolean): Promise<SessionSchema> {
-        return Session.findOneAndUpdate({ id: sessionId }, { showVotes: status });
+    public async setSessionVoteStatus(
+        sessionId: string,
+        showVotes: boolean
+    ): Promise<SessionSchema> {
+        return Session.findOneAndUpdate(
+            { id: sessionId },
+            { showVotes },
+            { useFindAndModify: true }
+        );
+    }
+
+    public async setSessionTopic(sessionId: string, currentTopic: string): Promise<SessionSchema> {
+        return Session.findOneAndUpdate(
+            { id: sessionId },
+            { currentTopic },
+            { useFindAndModify: true }
+        );
     }
 }
 
