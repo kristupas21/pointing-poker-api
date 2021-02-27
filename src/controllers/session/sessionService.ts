@@ -17,7 +17,7 @@ class SessionService {
         return this.idGenerator.generate();
     }
 
-    public async joinSession(params: JoinSessionParams): Promise<any> {
+    public async joinSession(params: JoinSessionParams): Promise<UserSchema> {
         const { sessionId, user } = params;
         const session: SessionSchema =  await Session.findOne({ id: sessionId }).lean();
 
@@ -25,20 +25,14 @@ class SessionService {
             throw { status: StatusCodes.NOT_FOUND, code: ERROR_CODES.SESSION_NOT_FOUND };
         }
 
-        if (session.useRoles && !user.role) {
+        if (session.useRoles && !user.role && !user.isObserver) {
             throw { status: StatusCodes.FORBIDDEN, code: ERROR_CODES.MUST_CHOOSE_ROLE };
         }
 
         const filter = { id: user.id, registeredSessionId: sessionId };
         const userParams = { ...user, registeredSessionId: sessionId };
-        const existingUser = await User.findOne(filter).lean();
 
-        if (existingUser) {
-            await User.replaceOne(filter, userParams)
-        } else {
-            const newUser = new User(userParams);
-            await newUser.save();
-        }
+        await User.updateOne(filter, userParams, { upsert: true });
 
         return params.user;
     }
