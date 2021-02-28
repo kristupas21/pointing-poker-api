@@ -2,15 +2,19 @@ import StatusCodes from 'http-status-codes';
 import { Response, Router } from 'express';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import { AppRequest } from '@global/types';
-import { JoinSessionParams } from '../session/sessionModel';
+import {
+    JoinSessionBody,
+    LoadSessionParams,
+    LoadSessionQuery,
+    StartSessionBody
+} from '../session/sessionModel';
 import SessionService from '../session/sessionService';
-import { UserSchema } from '@controllers/user/userSchema';
 
 const sessionController = Router();
 const sessionService = new SessionService();
 
 /* Join Session - "POST - api/session/join" */
-sessionController.post('/join', async (req: AppRequest<JoinSessionParams>, res: Response) => {
+sessionController.post('/join', async (req: AppRequest<JoinSessionBody>, res: Response) => {
     const { sessionId } = req.body;
 
     if (!sessionId) {
@@ -33,7 +37,7 @@ sessionController.post('/join', async (req: AppRequest<JoinSessionParams>, res: 
 
 /* Load Session - "GET - api/session/load/:sessionId" */
 sessionController.get('/load/:sessionId',
-    async (req: AppRequest<{ sessionId: string }, { userId: string }>, res: Response) => {
+    async (req: AppRequest<null, LoadSessionQuery, LoadSessionParams>, res: Response) => {
     const { sessionId } = req.params;
     const userId = req.query.userId;
 
@@ -64,17 +68,15 @@ sessionController.get('/load/:sessionId',
 
 /* Start Session - "POST - api/session/start" */
 sessionController.post('/start',
-    async (req: AppRequest<{ user: UserSchema, useRoles: boolean }>, res: Response) => {
-    const { user, useRoles } = req.body;
-
-    if (!user) {
+    async (req: AppRequest<StartSessionBody>, res: Response) => {
+    if (!req.body.user) {
         return res.status(StatusCodes.BAD_REQUEST).json({
             error: ERROR_CODES.MISSING_PARAM,
             param: 'user',
         });
     }
 
-    const sessionId = await sessionService.startSession(user, useRoles);
+    const sessionId = await sessionService.startSession(req.body);
 
     if (!sessionId) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

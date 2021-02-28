@@ -1,4 +1,4 @@
-import { IdGenerator, JoinSessionParams } from '../session/sessionModel';
+import { IdGenerator, JoinSessionBody, StartSessionBody } from '../session/sessionModel';
 import shortid from 'shortid';
 import Session, { SessionSchema } from '@controllers/session/sessionSchema';
 import User, { UserSchema } from '@controllers/user/userSchema';
@@ -17,7 +17,7 @@ class SessionService {
         return this.idGenerator.generate();
     }
 
-    public async joinSession(params: JoinSessionParams): Promise<UserSchema> {
+    public async joinSession(params: JoinSessionBody): Promise<UserSchema> {
         const { sessionId, user } = params;
         const session: SessionSchema =  await Session.findOne({ id: sessionId }).lean();
 
@@ -52,11 +52,13 @@ class SessionService {
         return { ...session, users };
     }
 
-    public async startSession(user: UserSchema, useRoles = true): Promise<string> {
+    public async startSession(params: StartSessionBody): Promise<string> {
+        const { user, useRoles, pointValues } = params;
         const sessionId = this.generateSectionId();
         const sessionDB = new Session({
             id: sessionId,
             useRoles,
+            pointValues,
         });
 
         const userDB = new User({

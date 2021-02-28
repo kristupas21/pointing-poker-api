@@ -1,3 +1,3 @@
 import { Request } from 'express';
 
-export type AppRequest<T = null, Q = never> = Request<T, any, any, Q>;
+export type AppRequest<B = null, Q = never, P = never> = Request<P, any, B, Q>;
