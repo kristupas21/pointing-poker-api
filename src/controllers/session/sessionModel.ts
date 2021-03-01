@@ -15,6 +15,7 @@ export interface StartSessionBody {
     user: UserSchema;
     useRoles: boolean;
     pointValues: PointValue[];
+    roles?: string[];
 }
 
 export interface LoadSessionParams {

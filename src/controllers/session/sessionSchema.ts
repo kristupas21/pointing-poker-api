@@ -1,6 +1,5 @@
 import { Document, Schema, model } from 'mongoose';
-import { DEFAULT_POINT_VALUES } from '@shared-with-ui/constants';
-import { PointValue } from '@shared-with-ui/types';
+import { PointValue, UserRole } from '@shared-with-ui/types';
 
 const Session = new Schema({
     id: { type: String, required: true },
@@ -12,6 +11,11 @@ const Session = new Schema({
         required: false,
         default: [],
     },
+    roles: {
+        type: [{ name: String, id: String }],
+        required: false,
+        default: [],
+    },
 })
 
 export interface SessionSchema extends Document {
@@ -20,6 +24,7 @@ export interface SessionSchema extends Document {
     showVotes: boolean;
     useRoles: boolean;
     pointValues: PointValue[];
+    roles: UserRole[];
 }
 
 export default model<SessionSchema>('Session', Session);

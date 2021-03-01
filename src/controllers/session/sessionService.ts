@@ -26,7 +26,11 @@ class SessionService {
         }
 
         if (session.useRoles && !user.role && !user.isObserver) {
-            throw { status: StatusCodes.FORBIDDEN, code: ERROR_CODES.MUST_CHOOSE_ROLE };
+            throw {
+                status: StatusCodes.FORBIDDEN,
+                code: ERROR_CODES.MUST_CHOOSE_ROLE,
+                payload: session.roles,
+            };
         }
 
         const filter = { id: user.id, registeredSessionId: sessionId };
@@ -53,12 +57,13 @@ class SessionService {
     }
 
     public async startSession(params: StartSessionBody): Promise<string> {
-        const { user, useRoles, pointValues } = params;
+        const { user, useRoles, pointValues, roles } = params;
         const sessionId = this.generateSectionId();
         const sessionDB = new Session({
             id: sessionId,
             useRoles,
             pointValues,
+            roles,
         });
 
         const userDB = new User({

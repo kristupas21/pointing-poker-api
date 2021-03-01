@@ -19,8 +19,8 @@ sessionController.post('/join', async (req: AppRequest<JoinSessionBody>, res: Re
 
     if (!sessionId) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error: ERROR_CODES.MISSING_PARAM,
-            param: 'sessionId',
+            code: ERROR_CODES.MISSING_PARAM,
+            payload: 'sessionId',
         });
     }
 
@@ -29,7 +29,7 @@ sessionController.post('/join', async (req: AppRequest<JoinSessionBody>, res: Re
         return res.status(StatusCodes.OK).json({ user, sessionId });
     } catch (e) {
         const status = e?.status || StatusCodes.INTERNAL_SERVER_ERROR;
-        const error = e?.code ? { error: e.code } : e;
+        const error = e?.code ? { code: e.code, payload: e.payload } : e;
 
         return res.status(status).json(error)
     }
@@ -43,8 +43,8 @@ sessionController.get('/load/:sessionId',
 
     if (!sessionId) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error: ERROR_CODES.MISSING_PARAM,
-            param: 'sessionId',
+            code: ERROR_CODES.MISSING_PARAM,
+            payload: 'sessionId',
         });
     }
 
@@ -53,14 +53,15 @@ sessionController.get('/load/:sessionId',
 
         if (!session) {
             return res.status(StatusCodes.NOT_FOUND).json({
-                sessionId, error: ERROR_CODES.NOT_FOUND
+                code: ERROR_CODES.NOT_FOUND,
+                payload: sessionId,
             });
         }
 
         return res.status(StatusCodes.OK).json({ session });
     } catch (e) {
         const status = e?.status || StatusCodes.INTERNAL_SERVER_ERROR;
-        const error = e?.code ? { error: e.code } : e;
+        const error = e?.code ? { code: e.code } : e;
 
         return res.status(status).json(error)
     }
@@ -71,8 +72,8 @@ sessionController.post('/start',
     async (req: AppRequest<StartSessionBody>, res: Response) => {
     if (!req.body.user) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error: ERROR_CODES.MISSING_PARAM,
-            param: 'user',
+            code: ERROR_CODES.MISSING_PARAM,
+            payload: 'user',
         });
     }
 
@@ -80,7 +81,7 @@ sessionController.post('/start',
 
     if (!sessionId) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            error: ERROR_CODES.INTERNAL_SERVER,
+            code: ERROR_CODES.INTERNAL_SERVER,
         });
     }
 

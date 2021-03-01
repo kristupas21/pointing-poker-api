@@ -8,3 +8,8 @@ export interface PointValue {
     pos: number;
     value: string;
 }
+
+export interface UserRole {
+    id: string;
+    name: string;
+}
