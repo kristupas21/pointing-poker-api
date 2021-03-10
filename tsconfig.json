@@ -96,6 +96,18 @@
       ],
       "@database/*": [
         "src/database/*"
+      ],
+      "@models/*": [
+        "src/models/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@routes/*": [
+        "src/routes/*"
+      ],
+      "@schemas/*": [
+        "src/schemas/*"
       ]
     },
   },

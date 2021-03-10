@@ -1,15 +1,15 @@
 export enum AvatarId {
-    EmojiHappy = 'emoji-happy',
-    EmojiSad = 'emoji-sad',
+  EmojiHappy = 'emoji-happy',
+  EmojiSad = 'emoji-sad',
 }
 
 export interface PointValue {
-    id: string;
-    pos: number;
-    value: string;
+  id: string;
+  pos: number;
+  value: string;
 }
 
 export interface UserRole {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }

@@ -23,7 +23,11 @@
     "@server": "dist/Server",
     "@controllers": "dist/controllers",
     "@database": "dist/database",
-    "@global": "dist/global"
+    "@global": "dist/global",
+    "@services": "dist/services",
+    "@models": "dist/models",
+    "@routes": "dist/routes",
+    "@schemas": "dist/schemas"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
@@ -39,21 +43,45 @@
       "project": "./tsconfig.json"
     },
     "rules": {
-      "max-len": [
-        "error",
-        {
-          "code": 100
-        }
-      ],
-      "no-console": 1,
-      "no-extra-boolean-cast": 0,
-      "@typescript-eslint/restrict-plus-operands": 0,
-      "@typescript-eslint/explicit-module-boundary-types": 0,
-      "@typescript-eslint/no-explicit-any": 0,
-      "@typescript-eslint/no-floating-promises": 0,
-      "@typescript-eslint/no-unsafe-member-access": 0,
-      "@typescript-eslint/no-unsafe-assignment": 0,
-      "@typescript-eslint/no-misused-promises": 0
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/indent": ["error", 2, {
+        "ignoredNodes": [
+          "SwitchCase",
+          "TSTypeReference", "TSTypeReference *",
+          "TSTypeParameterInstantiation", "TSTypeParameterInstantiation *"
+        ]
+      }],
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/no-inferrable-types": "off",
+      "@typescript-eslint/no-use-before-define": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/ban-ts-ignore": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "import/extensions": "off",
+      "arrow-parens": "off",
+      "implicit-arrow-linebreak": "off",
+      "comma-dangle": "off",
+      "import/no-cycle": "off",
+      "import/no-extraneous-dependencies": "off",
+      "import/prefer-default-export": "off",
+      "max-len": "off",
+      "no-restricted-imports": ["error", {
+        "paths":  [{
+          "name": "lodash",
+          "message": "Import specific lodash methods instead."
+        }]
+      }],
+      "no-unused-expressions": ["error", { "allowShortCircuit": true }],
+      "no-use-before-define": "off",
+      "object-curly-newline": "off",
+      "operator-linebreak": "off",
+      "quotes": ["error", "single", { "avoidEscape": true }],
+      "no-shadow": "off",
+      "@typescript-eslint/no-shadow": ["error"],
+      "@typescript-eslint/no-misused-promises": "off",
+      "no-underscore-dangle": "off"
     }
   },
   "eslintIgnore": [

@@ -1,4 +1,4 @@
 export interface WSMessage<T = never> {
-    body: T;
-    sessionId: string;
+  body: T;
+  sessionId: string;
 }
