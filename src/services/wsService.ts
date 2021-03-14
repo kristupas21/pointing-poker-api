@@ -6,7 +6,7 @@ import {
   WS_SHOW_VOTES,
   WS_USER_JOINED,
   WS_USER_LEFT,
-  WS_SET_VOTE_ROUND_TOPIC
+  WS_SET_VOTE_ROUND_TOPIC, WS_MODIFY_SESSION_USER
 } from '@shared-with-ui/constants';
 import UserService from '@services/userService';
 import SessionService from '@services/sessionService';
@@ -55,6 +55,8 @@ class WsService {
     this.socket.on(WS_SET_USER_VOTE_VALUE, this.handleSetVoteValue);
 
     this.socket.on(WS_SET_VOTE_ROUND_TOPIC, this.handleSetVoteRoundTopic);
+
+    this.socket.on(WS_MODIFY_SESSION_USER, this.handleModifySessionUser);
   }
 
   private handleUserJoined = (message: WSMessage<{ user: UserSchema, sessionId: string }>) => {
@@ -102,6 +104,16 @@ class WsService {
     await sessionService.setSessionTopic(this.sessionId, data.body.topic);
 
     this.getBroadcast().emit(WS_SET_VOTE_ROUND_TOPIC, data);
+  }
+
+  private handleModifySessionUser = async (
+    data: WSMessage<{ params: Partial<UserSchema>; userId: string }>
+  ) => {
+    const { userId, params } = data.body;
+    const user = await userService.modifyUser(this.sessionId, userId, params);
+    const message = this.constructWsMessage({ user });
+
+    this.getBroadcast().emit(WS_MODIFY_SESSION_USER, message);
   }
 
   public async destroy(userId: string): Promise<void> {

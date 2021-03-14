@@ -20,6 +20,14 @@ class UserService {
     );
   }
 
+  public async modifyUser(sessionId: string, userId: string, params: Partial<UserSchema>): Promise<UserSchema> {
+    return User.findOneAndUpdate(
+      { id: userId, registeredSessionId: sessionId },
+      { ...params },
+      { useFindAndModify: true, new: true }
+    ).lean();
+  }
+
   public async allSessionUsersVoted(sessionId: string): Promise<boolean> {
     const users = await User.find({ registeredSessionId: sessionId });
 

@@ -15,3 +15,4 @@ export const WS_HIDE_VOTES = '@@ws/@voteRound/HIDE_VOTES';
 export const WS_RESET_VOTE_ROUND = '@@ws/@voteRound/RESET';
 export const WS_SET_USER_VOTE_VALUE = '@@ws/@voteRound/SET_USER_VOTE_VALUE';
 export const WS_SET_VOTE_ROUND_TOPIC = '@@ws/@voteRound/SET_TOPIC';
+export const WS_MODIFY_SESSION_USER = '@@ws/@session/MODIFY_USER';
