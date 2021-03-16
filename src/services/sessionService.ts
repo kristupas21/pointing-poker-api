@@ -71,14 +71,10 @@ class SessionService {
       registeredSessionId: sessionId,
     });
 
-    try {
-      await sessionDB.save();
-      await userDB.save();
+    await sessionDB.save();
+    await userDB.save();
 
-      return sessionId;
-    } catch {
-      return null;
-    }
+    return sessionId;
   }
 
   public async setSessionVoteStatus(

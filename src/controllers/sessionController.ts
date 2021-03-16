@@ -67,13 +67,12 @@ export const startSessionController = async (req: AppRequest<StartSessionBody>, 
     });
   }
 
-  const sessionId = await sessionService.startSession(req.body);
-
-  if (!sessionId) {
+  try {
+    const sessionId = await sessionService.startSession(req.body);
+    return res.status(StatusCodes.CREATED).json({ sessionId });
+  } catch (e) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      code: ERROR_CODES.INTERNAL_SERVER,
+      code: ERROR_CODES.INTERNAL_SERVER, error: e,
     });
   }
-
-  return res.status(StatusCodes.CREATED).json({ sessionId });
 }
