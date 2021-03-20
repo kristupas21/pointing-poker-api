@@ -90,14 +90,6 @@ class WsService {
       .setUserVoteValue(this.sessionId, data.body.userId, data.body.voteValue);
 
     this.getBroadcast().emit(WS_SET_USER_VOTE_VALUE, data);
-
-    const allVoted =
-            await userService.allSessionUsersVoted(this.sessionId);
-
-    if (allVoted) {
-      await this.handleShowVotes({ body: null, sessionId: this.sessionId });
-    }
-
   };
 
   private handleSetVoteRoundTopic = async (data: WSMessage<{ topic: string }>) => {

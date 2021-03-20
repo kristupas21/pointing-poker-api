@@ -28,12 +28,6 @@ class UserService {
     ).lean();
   }
 
-  public async allSessionUsersVoted(sessionId: string): Promise<boolean> {
-    const users = await User.find({ registeredSessionId: sessionId });
-
-    return users.every((u) => u.voteValue != null);
-  }
-
   public async clearAllVoteValues(sessionId: string): Promise<void> {
     await User.updateMany({ registeredSessionId: sessionId }, { voteValue: null });
   }
