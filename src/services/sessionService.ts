@@ -25,7 +25,18 @@ class SessionService {
       throw { status: StatusCodes.NOT_FOUND, code: ERROR_CODES.SESSION_NOT_FOUND };
     }
 
-    if (session.useRoles && !user.role && !user.isObserver) {
+    const roleMissing =
+        session.useRoles &&
+        !user.role &&
+        !user.isObserver;
+
+    const invalidRole =
+        session.useRoles &&
+        !user.isObserver &&
+        user.role &&
+        !session.roles.some((r) => r.name === user.role.name);
+
+    if (roleMissing || invalidRole) {
       throw {
         status: StatusCodes.FORBIDDEN,
         code: ERROR_CODES.MUST_CHOOSE_ROLE,
