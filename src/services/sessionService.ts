@@ -2,7 +2,7 @@ import { IdGenerator, JoinSessionBody, StartSessionBody } from '@models/sessionM
 import shortid from 'shortid';
 import Session, { SessionSchema } from '@schemas/sessionSchema';
 import User, { UserSchema } from '@schemas/userSchema';
-import { ID_GEN_ALLOWED_CHARS } from '@global/constants';
+import { DAY_IN_MILLISECONDS, ID_GEN_ALLOWED_CHARS } from '@global/constants';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
 
@@ -27,13 +27,13 @@ class SessionService {
 
     const roleMissing =
         session.useRoles &&
-        !user.role &&
+        !user.role?.name &&
         !user.isObserver;
 
     const invalidRole =
         session.useRoles &&
         !user.isObserver &&
-        user.role &&
+        user.role?.name &&
         !session.roles.some((r) => r.name === user.role.name);
 
     if (roleMissing || invalidRole) {
@@ -67,9 +67,10 @@ class SessionService {
     return { ...session, users };
   }
 
-  public async startSession(params: StartSessionBody): Promise<string> {
+  public async startSession(params: StartSessionBody): Promise<{ sessionId: string, expiresAt: Date }> {
     const { user, useRoles, pointValues, roles } = params;
     const sessionId = this.generateSectionId();
+
     const sessionDB = new Session({
       id: sessionId,
       useRoles,
@@ -85,7 +86,10 @@ class SessionService {
     await sessionDB.save();
     await userDB.save();
 
-    return sessionId;
+    const { dateCreated } = sessionDB;
+    const expiresAt = new Date(dateCreated.getTime() + DAY_IN_MILLISECONDS);
+
+    return { sessionId, expiresAt };
   }
 
   public async setSessionVoteStatus(

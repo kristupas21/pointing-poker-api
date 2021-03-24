@@ -68,8 +68,8 @@ export const startSessionController = async (req: AppRequest<StartSessionBody>, 
   }
 
   try {
-    const sessionId = await sessionService.startSession(req.body);
-    return res.status(StatusCodes.CREATED).json({ sessionId });
+    const response = await sessionService.startSession(req.body);
+    return res.status(StatusCodes.CREATED).json({ ...response });
   } catch (e) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       code: ERROR_CODES.INTERNAL_SERVER, error: e,

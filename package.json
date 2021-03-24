@@ -44,13 +44,19 @@
     },
     "rules": {
       "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/indent": ["error", 2, {
-        "ignoredNodes": [
-          "SwitchCase",
-          "TSTypeReference", "TSTypeReference *",
-          "TSTypeParameterInstantiation", "TSTypeParameterInstantiation *"
-        ]
-      }],
+      "@typescript-eslint/indent": [
+        "error",
+        2,
+        {
+          "ignoredNodes": [
+            "SwitchCase",
+            "TSTypeReference",
+            "TSTypeReference *",
+            "TSTypeParameterInstantiation",
+            "TSTypeParameterInstantiation *"
+          ]
+        }
+      ],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-inferrable-types": "off",
@@ -67,19 +73,37 @@
       "import/no-extraneous-dependencies": "off",
       "import/prefer-default-export": "off",
       "max-len": "off",
-      "no-restricted-imports": ["error", {
-        "paths":  [{
-          "name": "lodash",
-          "message": "Import specific lodash methods instead."
-        }]
-      }],
-      "no-unused-expressions": ["error", { "allowShortCircuit": true }],
+      "no-restricted-imports": [
+        "error",
+        {
+          "paths": [
+            {
+              "name": "lodash",
+              "message": "Import specific lodash methods instead."
+            }
+          ]
+        }
+      ],
+      "no-unused-expressions": [
+        "error",
+        {
+          "allowShortCircuit": true
+        }
+      ],
       "no-use-before-define": "off",
       "object-curly-newline": "off",
       "operator-linebreak": "off",
-      "quotes": ["error", "single", { "avoidEscape": true }],
+      "quotes": [
+        "error",
+        "single",
+        {
+          "avoidEscape": true
+        }
+      ],
       "no-shadow": "off",
-      "@typescript-eslint/no-shadow": ["error"],
+      "@typescript-eslint/no-shadow": [
+        "error"
+      ],
       "@typescript-eslint/no-misused-promises": "off",
       "no-underscore-dangle": "off"
     }

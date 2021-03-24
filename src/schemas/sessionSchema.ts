@@ -1,11 +1,33 @@
 import { Document, Schema, model } from 'mongoose';
 import { PointValue, UserRole } from '@shared-with-ui/types';
+import { DAY_IN_SECONDS } from '@global/constants';
 
 const Session = new Schema({
-  id: { type: String, required: true },
-  currentTopic: { type: String, required: false, default: '' },
-  showVotes: { type: Boolean, required: false, default: false },
-  useRoles: { type: Boolean, required: false, default: false },
+  dateCreated: {
+    type: Date,
+    required: true,
+    default: Date.now,
+    expires: DAY_IN_SECONDS
+  },
+  id: {
+    type: String,
+    required: true
+  },
+  currentTopic: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  showVotes: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  useRoles: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
   pointValues: {
     type: [{ pos: Number, value: String, id: String }],
     required: false,
@@ -19,12 +41,13 @@ const Session = new Schema({
 })
 
 export interface SessionSchema extends Document {
+  dateCreated: Date;
   id: string;
   currentTopic: string;
-  showVotes: boolean;
-  useRoles: boolean;
   pointValues: PointValue[];
   roles: UserRole[];
+  showVotes: boolean;
+  useRoles: boolean;
 }
 
 export default model<SessionSchema>('Session', Session);

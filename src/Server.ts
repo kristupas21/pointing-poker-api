@@ -4,8 +4,8 @@ import helmet from 'helmet';
 import express, { NextFunction, Request, Response } from 'express';
 import StatusCodes from 'http-status-codes';
 import 'express-async-errors';
+import api from '@routes/index';
 import logger from './global/Logger';
-import api from '@routes/_routes';
 
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
@@ -15,7 +15,7 @@ const { BAD_REQUEST } = StatusCodes;
  ***********************************************************************************/
 
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Show routes called in console during development
