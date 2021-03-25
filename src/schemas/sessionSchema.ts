@@ -1,14 +1,7 @@
 import { Document, Schema, model } from 'mongoose';
 import { PointValue, UserRole } from '@shared-with-ui/types';
-import { DAY_IN_SECONDS } from '@global/constants';
 
 const Session = new Schema({
-  dateCreated: {
-    type: Date,
-    required: true,
-    default: Date.now,
-    expires: DAY_IN_SECONDS
-  },
   id: {
     type: String,
     required: true
@@ -41,7 +34,6 @@ const Session = new Schema({
 })
 
 export interface SessionSchema extends Document {
-  dateCreated: Date;
   id: string;
   currentTopic: string;
   pointValues: PointValue[];

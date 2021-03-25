@@ -63,7 +63,7 @@ class WsService {
     this.getBroadcast().emit(WS_USER_JOINED, message);
   }
 
-  private handleShowVotes = async (message: WSMessage<void>) => {
+  private handleShowVotes = async (message: WSMessage<{ user: UserSchema }>) => {
     await sessionService
       .setSessionVoteStatus(this.sessionId, true);
 

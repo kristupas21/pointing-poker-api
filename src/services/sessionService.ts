@@ -2,7 +2,7 @@ import { IdGenerator, JoinSessionBody, StartSessionBody } from '@models/sessionM
 import shortid from 'shortid';
 import Session, { SessionSchema } from '@schemas/sessionSchema';
 import User, { UserSchema } from '@schemas/userSchema';
-import { DAY_IN_MILLISECONDS, ID_GEN_ALLOWED_CHARS } from '@global/constants';
+import { ID_GEN_ALLOWED_CHARS } from '@global/constants';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
 
@@ -67,7 +67,7 @@ class SessionService {
     return { ...session, users };
   }
 
-  public async startSession(params: StartSessionBody): Promise<{ sessionId: string, expiresAt: Date }> {
+  public async startSession(params: StartSessionBody): Promise<{ sessionId: string }> {
     const { user, useRoles, pointValues, roles } = params;
     const sessionId = this.generateSectionId();
 
@@ -86,10 +86,7 @@ class SessionService {
     await sessionDB.save();
     await userDB.save();
 
-    const { dateCreated } = sessionDB;
-    const expiresAt = new Date(dateCreated.getTime() + DAY_IN_MILLISECONDS);
-
-    return { sessionId, expiresAt };
+    return { sessionId };
   }
 
   public async setSessionVoteStatus(
