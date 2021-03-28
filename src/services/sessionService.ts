@@ -19,7 +19,7 @@ class SessionService {
 
   public async joinSession(params: JoinSessionBody): Promise<UserSchema> {
     const { sessionId, user } = params;
-    const session: SessionSchema =  await Session.findOne({ id: sessionId }).lean();
+    const session: SessionSchema = await Session.findOne({ id: sessionId }).lean();
 
     if (!session) {
       throw { status: StatusCodes.NOT_FOUND, code: ERROR_CODES.SESSION_NOT_FOUND };
@@ -106,6 +106,16 @@ class SessionService {
       { currentTopic },
       { useFindAndModify: true }
     );
+  }
+
+  public async getSessionInfo(sessionId: string): Promise<SessionSchema> {
+    const session: SessionSchema = await Session.findOne({ id: sessionId }).lean();
+
+    if (!session) {
+      throw { status: StatusCodes.NOT_FOUND, code: ERROR_CODES.SESSION_NOT_FOUND };
+    }
+
+    return session;
   }
 }
 

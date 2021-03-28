@@ -25,3 +25,7 @@ export interface LoadSessionParams {
 export interface LoadSessionQuery {
   userId: string;
 }
+
+export interface SessionInfoParams {
+  sessionId: string;
+}

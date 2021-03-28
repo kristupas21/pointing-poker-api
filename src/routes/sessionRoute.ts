@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { joinSessionController, loadSessionController, startSessionController } from '@controllers/sessionController';
+import {
+  joinSessionController,
+  loadSessionController,
+  sessionInfoController,
+  startSessionController
+} from '@controllers/sessionController';
 
 const sessionRoute = Router();
 
@@ -11,5 +16,8 @@ sessionRoute.get('/load/:sessionId', loadSessionController)
 
 /* Start Session - "POST - api/session/start" */
 sessionRoute.post('/start', startSessionController);
+
+/* Get Session Info - "GET - api/session/info/:sessionId" */
+sessionRoute.get('/info/:sessionId', sessionInfoController);
 
 export default sessionRoute;

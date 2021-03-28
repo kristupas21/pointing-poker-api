@@ -70,42 +70,42 @@ class WsService {
     this.getBroadcast().emit(WS_SHOW_VOTES, message);
   };
 
-  private handleHideVotes = async (data: WSMessage<void>) => {
+  private handleHideVotes = async (message: WSMessage<void>) => {
     await sessionService
       .setSessionVoteStatus(this.sessionId, false);
 
-    this.getBroadcast().emit(WS_HIDE_VOTES, data);
+    this.getBroadcast().emit(WS_HIDE_VOTES, message);
   };
 
-  private handleResetVoteRound = async (data: WSMessage<void>) => {
+  private handleResetVoteRound = async (message: WSMessage<{ user: UserSchema }>) => {
     await sessionService.setSessionVoteStatus(this.sessionId, false);
     await sessionService.setSessionTopic(this.sessionId, '');
     await userService.clearAllVoteValues(this.sessionId);
 
-    this.getBroadcast().emit(WS_RESET_VOTE_ROUND, data);
+    this.getBroadcast().emit(WS_RESET_VOTE_ROUND, message);
   };
 
-  private handleSetVoteValue = async (data: WSMessage<{ userId: string; voteValue: string }>) => {
+  private handleSetVoteValue = async (message: WSMessage<{ userId: string; voteValue: string }>) => {
     await userService
-      .setUserVoteValue(this.sessionId, data.body.userId, data.body.voteValue);
+      .setUserVoteValue(this.sessionId, message.body.userId, message.body.voteValue);
 
-    this.getBroadcast().emit(WS_SET_USER_VOTE_VALUE, data);
+    this.getBroadcast().emit(WS_SET_USER_VOTE_VALUE, message);
   };
 
-  private handleSetVoteRoundTopic = async (data: WSMessage<{ topic: string }>) => {
-    await sessionService.setSessionTopic(this.sessionId, data.body.topic);
+  private handleSetVoteRoundTopic = async (message: WSMessage<{ topic: string }>) => {
+    await sessionService.setSessionTopic(this.sessionId, message.body.topic);
 
-    this.getBroadcast().emit(WS_SET_VOTE_ROUND_TOPIC, data);
+    this.getBroadcast().emit(WS_SET_VOTE_ROUND_TOPIC, message);
   }
 
   private handleModifySessionUser = async (
-    data: WSMessage<{ params: Partial<UserSchema>; userId: string }>
+    message: WSMessage<{ params: Partial<UserSchema>; userId: string }>
   ) => {
-    const { userId, params } = data.body;
+    const { userId, params } = message.body;
     const user = await userService.modifyUser(this.sessionId, userId, params);
-    const message = this.constructWsMessage({ user });
+    const newMessage = this.constructWsMessage({ user });
 
-    this.getBroadcast().emit(WS_MODIFY_SESSION_USER, message);
+    this.getBroadcast().emit(WS_MODIFY_SESSION_USER, newMessage);
   }
 
   public async destroy(userId: string): Promise<void> {

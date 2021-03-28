@@ -1,5 +1,11 @@
 import { AppRequest } from '@global/types';
-import { JoinSessionBody, LoadSessionParams, LoadSessionQuery, StartSessionBody } from '@models/sessionModel';
+import {
+  JoinSessionBody,
+  LoadSessionParams,
+  LoadSessionQuery,
+  SessionInfoParams,
+  StartSessionBody
+} from '@models/sessionModel';
 import { Response } from 'express';
 import StatusCodes from 'http-status-codes';
 import { ERROR_CODES } from '@shared-with-ui/constants';
@@ -45,7 +51,7 @@ export const loadSessionController = async (req: AppRequest<null, LoadSessionQue
 
     if (!session) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        code: ERROR_CODES.NOT_FOUND,
+        code: ERROR_CODES.SESSION_NOT_FOUND,
         payload: sessionId,
       });
     }
@@ -74,5 +80,26 @@ export const startSessionController = async (req: AppRequest<StartSessionBody>, 
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       code: ERROR_CODES.INTERNAL_SERVER, error: e,
     });
+  }
+}
+
+export const sessionInfoController = async (req: AppRequest<null, null, SessionInfoParams>, res: Response) => {
+  const { sessionId } = req.params;
+
+  if (!sessionId) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      code: ERROR_CODES.MISSING_PARAM,
+      payload: 'sessionId',
+    });
+  }
+
+  try {
+    const session = await sessionService.getSessionInfo(sessionId);
+    return res.status(StatusCodes.OK).json({ session });
+  } catch (e) {
+    const status = e?.status || StatusCodes.INTERNAL_SERVER_ERROR;
+    const error = e?.code ? { code: e.code } : e;
+
+    return res.status(status).json(error)
   }
 }
