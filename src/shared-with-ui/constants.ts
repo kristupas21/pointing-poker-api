@@ -6,6 +6,7 @@ export const ERROR_CODES = {
   SESSION_NOT_FOUND: 'error.sessionNotFound',
   UNEXPECTED: 'error.unexpected',
   USER_NOT_FOUND: 'error.userNotFound',
+  USER_NAME_EXISTS: 'error.userNameExists',
 };
 
 export const WS_USER_JOINED = '@@ws/USER_JOINED';

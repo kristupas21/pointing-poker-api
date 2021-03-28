@@ -35,6 +35,18 @@ class UserService {
   public async findUserById(sessionId: string, userId: string): Promise<UserSchema> {
     return User.findOne({ registeredSessionId: sessionId, id: userId });
   }
+
+  public async userNameExists(sessionId: string, name: string): Promise<boolean> {
+    const user = await User.findOne({ registeredSessionId: sessionId, name });
+    return !!user;
+  }
+
+  public async registerUser(sessionId: string, user: UserSchema): Promise<void> {
+    const filter = { id: user.id, registeredSessionId: sessionId };
+    const userParams = { ...user, registeredSessionId: sessionId };
+
+    await User.updateOne(filter, userParams, { upsert: true });
+  }
 }
 
 export default UserService;

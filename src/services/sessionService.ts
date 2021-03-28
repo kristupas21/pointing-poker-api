@@ -5,6 +5,9 @@ import User, { UserSchema } from '@schemas/userSchema';
 import { ID_GEN_ALLOWED_CHARS } from '@global/constants';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
+import UserService from '@services/userService';
+
+const userService = new UserService();
 
 class SessionService {
   private idGenerator: IdGenerator = shortid;
@@ -23,6 +26,12 @@ class SessionService {
 
     if (!session) {
       throw { status: StatusCodes.NOT_FOUND, code: ERROR_CODES.SESSION_NOT_FOUND };
+    }
+
+    const userNameExists = await userService.userNameExists(sessionId, user.name);
+
+    if (userNameExists) {
+      throw { status: StatusCodes.CONFLICT, code: ERROR_CODES.USER_NAME_EXISTS };
     }
 
     const roleMissing =
@@ -44,10 +53,7 @@ class SessionService {
       };
     }
 
-    const filter = { id: user.id, registeredSessionId: sessionId };
-    const userParams = { ...user, registeredSessionId: sessionId };
-
-    await User.updateOne(filter, userParams, { upsert: true });
+    await userService.registerUser(sessionId, user);
 
     return params.user;
   }
