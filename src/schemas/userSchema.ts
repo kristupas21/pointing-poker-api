@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { AvatarId, UserRole } from '@shared-with-ui/types';
+import { AvatarId } from '@shared-with-ui/types';
 
 const User = new Schema({
   avatarId: {
@@ -21,7 +21,8 @@ const User = new Schema({
     required: true
   },
   role: {
-    type: { id: String, name: String },
+    type: String,
+    default: '',
     required: false
   },
   registeredSessionId: {
@@ -40,7 +41,7 @@ export interface UserSchema extends Document {
   id: string;
   isObserver?: boolean;
   name: string;
-  role?: UserRole;
+  role?: string;
   registeredSessionId?: string;
   voteValue?: string;
 }

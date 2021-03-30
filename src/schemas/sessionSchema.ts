@@ -1,5 +1,5 @@
 import { Document, Schema, model } from 'mongoose';
-import { PointValue, UserRole } from '@shared-with-ui/types';
+import { PointValue } from '@shared-with-ui/types';
 
 const Session = new Schema({
   id: {
@@ -27,7 +27,7 @@ const Session = new Schema({
     default: [],
   },
   roles: {
-    type: [{ name: String, id: String }],
+    type: [String],
     required: false,
     default: [],
   },
@@ -37,7 +37,7 @@ export interface SessionSchema extends Document {
   id: string;
   currentTopic: string;
   pointValues: PointValue[];
-  roles: UserRole[];
+  roles: string[];
   showVotes: boolean;
   useRoles: boolean;
 }
