@@ -28,34 +28,11 @@ class SessionService {
       throw { status: StatusCodes.NOT_FOUND, code: ERROR_CODES.SESSION_NOT_FOUND };
     }
 
-    const userNameExists = await userService.userNameExists(sessionId, user.name);
-
-    if (userNameExists) {
+    if (await userService.userNameExists(sessionId, user.name)) {
       throw { status: StatusCodes.CONFLICT, code: ERROR_CODES.USER_NAME_EXISTS };
     }
 
-    const roleMissing =
-        session.useRoles &&
-        !user.role?.name &&
-        !user.isObserver;
-
-    const invalidRole =
-        session.useRoles &&
-        !user.isObserver &&
-        user.role?.name &&
-        !session.roles.some((r) => r.name === user.role.name);
-
-    if (roleMissing || invalidRole) {
-      throw {
-        status: StatusCodes.FORBIDDEN,
-        code: ERROR_CODES.MUST_CHOOSE_ROLE,
-        payload: session.roles,
-      };
-    }
-
-    await userService.registerUser(sessionId, user);
-
-    return params.user;
+    return await userService.registerUser(sessionId, user);
   }
 
   public async loadSession(sessionId: string, userId: string): Promise<any> {

@@ -41,11 +41,11 @@ class UserService {
     return !!user;
   }
 
-  public async registerUser(sessionId: string, user: UserSchema): Promise<void> {
+  public async registerUser(sessionId: string, user: UserSchema): Promise<UserSchema> {
     const filter = { id: user.id, registeredSessionId: sessionId };
     const userParams = { ...user, registeredSessionId: sessionId };
 
-    await User.updateOne(filter, userParams, { upsert: true });
+    return User.updateOne(filter, userParams, { upsert: true, new: true }).lean();
   }
 }
 
