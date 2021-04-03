@@ -85,9 +85,9 @@ class WsService {
     this.getBroadcast().emit(WS_RESET_VOTE_ROUND, message);
   };
 
-  private handleSetVoteValue = async (message: WSMessage<{ userId: string; voteValue: string }>) => {
+  private handleSetVoteValue = async (message: WSMessage<{ user: UserSchema; voteValue: string }>) => {
     await userService
-      .setUserVoteValue(this.sessionId, message.body.userId, message.body.voteValue);
+      .setUserVoteValue(this.sessionId, message.body.user.id, message.body.voteValue);
 
     this.getBroadcast().emit(WS_SET_USER_VOTE_VALUE, message);
   };

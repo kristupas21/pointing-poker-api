@@ -10,3 +10,7 @@ export interface PointValue {
   pos: number;
   value: string;
 }
+
+export type ValueOf<T> = T[keyof T];
+
+export type Primitive = string | boolean | number;

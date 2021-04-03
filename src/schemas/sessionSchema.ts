@@ -33,7 +33,7 @@ const Session = new Schema({
   },
 })
 
-export interface SessionSchema extends Document {
+export interface SessionSchemaProps {
   id: string;
   currentTopic: string;
   pointValues: PointValue[];
@@ -41,5 +41,7 @@ export interface SessionSchema extends Document {
   showVotes: boolean;
   useRoles: boolean;
 }
+
+export type SessionSchema = Document & SessionSchemaProps;
 
 export default model<SessionSchema>('Session', Session);

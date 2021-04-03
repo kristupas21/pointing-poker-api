@@ -36,7 +36,7 @@ const User = new Schema({
   },
 });
 
-export interface UserSchema extends Document {
+export interface UserSchemaProps {
   avatarId?: AvatarId;
   id: string;
   isObserver?: boolean;
@@ -45,5 +45,7 @@ export interface UserSchema extends Document {
   registeredSessionId?: string;
   voteValue?: string;
 }
+
+export type UserSchema = Document & UserSchemaProps;
 
 export default model<UserSchema>('User', User);
