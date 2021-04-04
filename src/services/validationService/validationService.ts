@@ -36,7 +36,7 @@ import {
 } from '@services/validationService/functions';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
-import ErrorService from '@services/errorService/errorService';
+import ErrorService from '@services/errorService';
 import { Primitive } from '@shared-with-ui/types';
 
 const errorService = new ErrorService();

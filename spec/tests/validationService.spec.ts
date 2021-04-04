@@ -1,4 +1,4 @@
-import ValidationService from '@services/validationService/validationService';
+import ValidationService from '@services/validationService';
 import { ValidationSchema } from '@services/validationService/types';
 import {
   ARRAY_OBJECT,
@@ -16,7 +16,7 @@ import {
   STRING_NUMBER_MAX,
   STRING_NUMBER_MIN
 } from '@services/validationService/validatorKeys';
-import ErrorService from '@services/errorService/errorService';
+import ErrorService from '@services/errorService';
 import StatusCodes from 'http-status-codes';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 

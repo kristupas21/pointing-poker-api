@@ -9,7 +9,7 @@ import {
 import { Response } from 'express';
 import StatusCodes from 'http-status-codes';
 import SessionService from '@services/sessionService';
-import ErrorService from '@services/errorService/errorService';
+import ErrorService from '@services/errorService';
 
 const sessionService = new SessionService();
 const errorService = new ErrorService();

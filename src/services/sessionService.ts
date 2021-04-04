@@ -6,9 +6,9 @@ import { ID_GEN_ALLOWED_CHARS } from '@global/constants';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
 import UserService from '@services/userService';
-import ValidationService from '@services/validationService/validationService';
+import ValidationService from '@services/validationService';
 import VALIDATION_SCHEMA from '@services/validationService/validationSchemas';
-import ErrorService from '@services/errorService/errorService';
+import ErrorService from '@services/errorService';
 
 const userService = new UserService();
 const validationService = new ValidationService();
@@ -18,7 +18,7 @@ class SessionService {
   private idGenerator: IdGenerator = shortid;
 
   public constructor() {
-    this.idGenerator.characters(ID_GEN_ALLOWED_CHARS)
+    this.idGenerator.characters(ID_GEN_ALLOWED_CHARS);
   }
 
   private generateSectionId(): string {
