@@ -26,6 +26,6 @@ const USER: ValidationSchema<UserSchemaProps> = {
   voteValue: [
     { key: STRING },
   ],
-}
+};
 
 export default USER;

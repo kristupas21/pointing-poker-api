@@ -47,7 +47,7 @@ const MockNestedSchema: ValidationSchema<MockNested> = {
     { key: REQUIRED },
     { key: STRING },
   ]
-}
+};
 
 const MockSchema: ValidationSchema<MockObject> = {
   str: [
@@ -81,7 +81,7 @@ const MockSchema: ValidationSchema<MockObject> = {
   withExceptions: [
     { key: STRING, exceptions: [1000] }
   ],
-}
+};
 
 describe('validationService', () => {
   const validationService = new ValidationService();
@@ -106,7 +106,7 @@ describe('validationService', () => {
     expect(
       validationService.validateBySchema(validSchema, MockSchema)
     ).toEqual(undefined);
-  })
+  });
 
   it(`throws ${REQUIRED} exception`, () => {
     const payload: MockObject = {
@@ -209,7 +209,7 @@ describe('validationService', () => {
     try {
       validationService.validateBySchema(payload, MockSchema);
     } catch (e) {
-      expect(e).toEqual(getError({ stringNum: STRING_NUMBER }))
+      expect(e).toEqual(getError({ stringNum: STRING_NUMBER }));
     }
   });
 
@@ -234,6 +234,6 @@ describe('validationService', () => {
 
     expect(
       validationService.validateBySchema(payload, MockSchema)
-    ).toEqual(undefined)
-  })
-})
+    ).toEqual(undefined);
+  });
+});

@@ -7,6 +7,6 @@ const SESSION_INFO_PARAMS: ValidationSchema<SessionInfoParams> = {
     { key: REQUIRED },
     { key: STRING },
   ],
-}
+};
 
 export default SESSION_INFO_PARAMS;

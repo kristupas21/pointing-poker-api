@@ -34,5 +34,5 @@ io.on('connection', (socket: Socket) => {
 
   socket.on('disconnect', async () => {
     await wsService.destroy(userId);
-  })
-})
+  });
+});

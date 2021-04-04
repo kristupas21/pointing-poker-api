@@ -30,6 +30,6 @@ const POINT_VALUE: ValidationSchema<PointValue> = {
     { key: STRING_NUMBER_MIN, args: [NUMBER_INPUT_MIN]},
     { key: STRING_NUMBER_MAX, args: [NUMBER_INPUT_MAX]},
   ],
-}
+};
 
 export default POINT_VALUE;

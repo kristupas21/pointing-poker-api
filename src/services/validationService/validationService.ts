@@ -134,7 +134,7 @@ class ValidationService {
       StatusCodes.BAD_REQUEST,
       ERROR_CODES.INVALID_PARAMS,
       errorObject,
-    )
+    );
   }
 
   public validatePrimitive<T extends Primitive>(item: T, validators: Validator[]): void {
@@ -148,7 +148,7 @@ class ValidationService {
       StatusCodes.BAD_REQUEST,
       ERROR_CODES.INVALID_PARAMS,
       errorKey,
-    )
+    );
   }
 }
 

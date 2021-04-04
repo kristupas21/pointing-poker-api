@@ -20,9 +20,9 @@ export const joinSessionController = async (req: AppRequest<JoinSessionBody>, re
     return res.status(StatusCodes.OK).json({ user, sessionId: req.body.sessionId });
   } catch (e) {
     const { status, error } = errorService.parse(e);
-    return res.status(status).json(error)
+    return res.status(status).json(error);
   }
-}
+};
 
 export const loadSessionController = async (req: AppRequest<null, LoadSessionQuery, LoadSessionParams>, res: Response) => {
   const { sessionId } = req.params;
@@ -33,9 +33,9 @@ export const loadSessionController = async (req: AppRequest<null, LoadSessionQue
     return res.status(StatusCodes.OK).json({ session });
   } catch (e) {
     const { status, error } = errorService.parse(e);
-    return res.status(status).json(error)
+    return res.status(status).json(error);
   }
-}
+};
 
 export const startSessionController = async (req: AppRequest<StartSessionBody>, res: Response) => {
   try {
@@ -43,9 +43,9 @@ export const startSessionController = async (req: AppRequest<StartSessionBody>, 
     return res.status(StatusCodes.CREATED).json({ ...response });
   } catch (e) {
     const { status, error } = errorService.parse(e);
-    return res.status(status).json(error)
+    return res.status(status).json(error);
   }
-}
+};
 
 export const sessionInfoController = async (req: AppRequest<null, null, SessionInfoParams>, res: Response) => {
   try {
@@ -53,6 +53,6 @@ export const sessionInfoController = async (req: AppRequest<null, null, SessionI
     return res.status(StatusCodes.OK).json({ session });
   } catch (e) {
     const { status, error } = errorService.parse(e);
-    return res.status(status).json(error)
+    return res.status(status).json(error);
   }
-}
+};

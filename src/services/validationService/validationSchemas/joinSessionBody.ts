@@ -12,6 +12,6 @@ const JOIN_SESSION_BODY: ValidationSchema<JoinSessionBody> = {
     { key: REQUIRED },
     { key: OBJECT, schema: USER },
   ],
-}
+};
 
 export default JOIN_SESSION_BODY;

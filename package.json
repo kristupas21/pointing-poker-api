@@ -93,6 +93,7 @@
       "no-use-before-define": "off",
       "object-curly-newline": "off",
       "operator-linebreak": "off",
+      "semi": "error",
       "quotes": [
         "error",
         "single",
@@ -105,7 +106,10 @@
         "error"
       ],
       "@typescript-eslint/no-misused-promises": "off",
-      "no-underscore-dangle": "off"
+      "no-underscore-dangle": "off",
+      "@typescript-eslint/ban-types": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-call": "off"
     }
   },
   "eslintIgnore": [

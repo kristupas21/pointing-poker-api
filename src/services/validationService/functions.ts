@@ -10,7 +10,7 @@ export function castStringToNum(fn: ValidatorFn): ValidatorFn {
   return (...args) => {
     args.splice(0, 1, Number(args[0]));
     return fn(...args);
-  }
+  };
 }
 
 export function isProvided(value: any): boolean {
@@ -54,7 +54,7 @@ export function isNumberMaxValid(value: number, max: number): boolean {
 }
 
 export function isPrimitiveArray(value: any[]): boolean {
-  return isArray(value) && value.every((v) => (isBoolean(v) || isString(v) || isNumber(v)))
+  return isArray(value) && value.every((v) => (isBoolean(v) || isString(v) || isNumber(v)));
 }
 
 export function isObjectArray(value: any[]): boolean {

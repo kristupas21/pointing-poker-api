@@ -11,6 +11,6 @@ const LOAD_SESSION_PARAMS: ValidationSchema<LoadSessionParams & LoadSessionQuery
     { key: REQUIRED },
     { key: STRING },
   ],
-}
+};
 
 export default LOAD_SESSION_PARAMS;

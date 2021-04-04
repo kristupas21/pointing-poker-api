@@ -31,7 +31,7 @@ const Session = new Schema({
     required: false,
     default: [],
   },
-})
+});
 
 export interface SessionSchemaProps {
   id: string;

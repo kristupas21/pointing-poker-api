@@ -25,6 +25,6 @@ const START_SESSION_BODY: ValidationSchema<StartSessionBody> = {
   roles: [
     { key: ARRAY_PRIMITIVE, validators: [{ key: STRING }] },
   ],
-}
+};
 
 export default START_SESSION_BODY;
