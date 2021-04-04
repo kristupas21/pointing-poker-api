@@ -17,9 +17,10 @@ import {
   REQUIRED,
   STRING,
   STRING_MAX,
-  STRING_MIN
+  STRING_MIN, STRING_NUMBER, STRING_NUMBER_MAX, STRING_NUMBER_MIN
 } from '@services/validationService/validatorKeys';
 import {
+  castStringToNum,
   isBoolean,
   isNillable,
   isNumber,
@@ -53,12 +54,21 @@ class ValidationService {
     [ARRAY_OBJECT]: isNillable(isObjectArray),
     [BOOLEAN]: isNillable(isBoolean),
     [OBJECT]: isNillable(isObject),
+    [STRING_NUMBER]: isNillable(castStringToNum(isNumber)),
+    [STRING_NUMBER_MAX]: isNillable(castStringToNum(isNumberMaxValid)),
+    [STRING_NUMBER_MIN]: isNillable(castStringToNum(isNumberMinValid)),
   }
 
+  private exceptionKey = '__EXCEPTION__';
+
   private resolveErrorKey(validators: Validator[], value: any): string {
-    return validators.reduce((result, params) => {
+    const errorKey = validators.reduce((result, params) => {
       if (result) {
         return result;
+      }
+
+      if (params.exceptions?.includes(value)) {
+        return this.exceptionKey;
       }
 
       const validate = this.validationMap[params.key];
@@ -82,6 +92,12 @@ class ValidationService {
 
       return result;
     }, '');
+
+    if (errorKey && errorKey !== this.exceptionKey) {
+      return errorKey;
+    }
+
+    return undefined;
   }
 
   private resolveErrorObject<T extends object>(

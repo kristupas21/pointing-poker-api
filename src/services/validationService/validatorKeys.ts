@@ -9,3 +9,6 @@ export const STRING = 'STRING';
 export const STRING_MAX = 'STRING_MAX';
 export const STRING_MIN = 'STRING_MIN';
 export const BOOLEAN = 'BOOLEAN';
+export const STRING_NUMBER = 'STRING_NUMBER';
+export const STRING_NUMBER_MIN = 'STRING_NUMBER_MIN';
+export const STRING_NUMBER_MAX = 'STRING_NUMBER_MAX';

@@ -22,3 +22,6 @@ export const INPUT_MIN_CHARS = 2;
 export const INPUT_MAX_CHARS = 50;
 export const NUMBER_INPUT_MIN = 0;
 export const NUMBER_INPUT_MAX = 100;
+
+export const POINT_VALUE_INFINITY = '∞';
+export const POINT_VALUE_UNKNOWN = '?';

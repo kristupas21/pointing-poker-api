@@ -7,12 +7,7 @@ import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
 import UserService from '@services/userService';
 import ValidationService from '@services/validationService/validationService';
-import {
-  VALIDATION_SCHEMA_JOIN_SESSION_BODY,
-  VALIDATION_SCHEMA_LOAD_SESSION_PARAMS,
-  VALIDATION_SCHEMA_SESSION_INFO_PARAMS,
-  VALIDATION_SCHEMA_START_SESSION_BODY
-} from '@services/validationService/validationSchemas';
+import VALIDATION_SCHEMA from '@services/validationService/validationSchemas';
 import ErrorService from '@services/errorService/errorService';
 
 const userService = new UserService();
@@ -31,7 +26,7 @@ class SessionService {
   }
 
   public async joinSession(body: JoinSessionBody): Promise<UserSchema> {
-    validationService.validateBySchema(body, VALIDATION_SCHEMA_JOIN_SESSION_BODY);
+    validationService.validateBySchema(body, VALIDATION_SCHEMA.JOIN_SESSION_BODY);
 
     const { sessionId, user } = body;
     const session: SessionSchema = await Session.findOne({ id: sessionId }).lean();
@@ -50,7 +45,7 @@ class SessionService {
   public async loadSession(sessionId: string, userId: string): Promise<any> {
     validationService.validateBySchema(
       { sessionId, userId },
-      VALIDATION_SCHEMA_LOAD_SESSION_PARAMS
+      VALIDATION_SCHEMA.LOAD_SESSION_PARAMS
     );
 
     const session = await Session.findOne({ id: sessionId }).lean();
@@ -74,7 +69,7 @@ class SessionService {
   }
 
   public async startSession(body: StartSessionBody): Promise<{ sessionId: string }> {
-    validationService.validateBySchema(body, VALIDATION_SCHEMA_START_SESSION_BODY);
+    validationService.validateBySchema(body, VALIDATION_SCHEMA.START_SESSION_BODY);
 
     const { user, useRoles, pointValues, roles } = body;
     const sessionId = this.generateSectionId();
@@ -117,7 +112,7 @@ class SessionService {
   }
 
   public async getSessionInfo(params: SessionInfoParams): Promise<SessionSchema> {
-    validationService.validateBySchema(params, VALIDATION_SCHEMA_SESSION_INFO_PARAMS);
+    validationService.validateBySchema(params, VALIDATION_SCHEMA.SESSION_INFO_PARAMS);
 
     const session: SessionSchema = await Session.findOne({ id: params.sessionId }).lean();
 

@@ -6,6 +6,13 @@ export function isNillable(fn: ValidatorFn): ValidatorFn {
   return (...args) => isNil(args[0]) || fn(...args);
 }
 
+export function castStringToNum(fn: ValidatorFn): ValidatorFn {
+  return (...args) => {
+    args.splice(0, 1, Number(args[0]));
+    return fn(...args);
+  }
+}
+
 export function isProvided(value: any): boolean {
   return value != null;
 }

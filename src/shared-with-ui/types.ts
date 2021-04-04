@@ -14,3 +14,7 @@ export interface PointValue {
 export type ValueOf<T> = T[keyof T];
 
 export type Primitive = string | boolean | number;
+
+export type PartialRecord<K extends keyof any, T> = {
+  [P in K]?: T;
+};
