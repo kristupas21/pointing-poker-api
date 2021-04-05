@@ -25,3 +25,9 @@ export const NUMBER_INPUT_MAX = 100;
 
 export const POINT_VALUE_INFINITY = '∞';
 export const POINT_VALUE_UNKNOWN = '?';
+
+export const MIN_POINT_VALUES_COUNT = 2;
+export const MAX_POINT_VALUES_COUNT = 16;
+
+export const MIN_ROLES_COUNT = 2;
+export const MAX_ROLES_COUNT = 8;

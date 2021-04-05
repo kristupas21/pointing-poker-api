@@ -7,6 +7,7 @@ import {
 } from '@services/validationService/types';
 import isEmpty from 'lodash/isEmpty';
 import {
+  ARRAY_LENGTH_MAX, ARRAY_LENGTH_MIN,
   ARRAY_OBJECT,
   ARRAY_PRIMITIVE,
   BOOLEAN,
@@ -16,20 +17,23 @@ import {
   OBJECT,
   REQUIRED,
   STRING,
-  STRING_MAX,
-  STRING_MIN, STRING_NUMBER, STRING_NUMBER_MAX, STRING_NUMBER_MIN
+  STRING_LENGTH_MAX,
+  STRING_LENGTH_MIN,
+  STRING_NUMBER,
+  STRING_NUMBER_MAX,
+  STRING_NUMBER_MIN
 } from '@services/validationService/validatorKeys';
 import {
-  castStringToNum,
+  castStringToNum, isArrayMaxLenValid, isArrayMinLenValid,
   isBoolean,
-  isNillable,
+  allowNil,
   isNumber,
   isNumberMaxValid,
   isNumberMinValid,
   isObject,
   isObjectArray,
   isPrimitiveArray,
-  isProvided,
+  isNotNil,
   isString,
   isStringMaxLenValid,
   isStringMinLenValid,
@@ -43,26 +47,28 @@ const errorService = new ErrorService();
 
 class ValidationService {
   private validationMap: Record<ValidatorKey, ValidatorFn> = {
-    [REQUIRED]: isProvided,
-    [STRING]: isNillable(isString),
-    [NUMBER]: isNillable(isNumber),
-    [STRING_MAX]: isNillable(isStringMaxLenValid),
-    [STRING_MIN]: isNillable(isStringMinLenValid),
-    [NUMBER_MIN]: isNillable(isNumberMinValid),
-    [NUMBER_MAX]: isNillable(isNumberMaxValid),
-    [ARRAY_PRIMITIVE]: isNillable(isPrimitiveArray),
-    [ARRAY_OBJECT]: isNillable(isObjectArray),
-    [BOOLEAN]: isNillable(isBoolean),
-    [OBJECT]: isNillable(isObject),
-    [STRING_NUMBER]: isNillable(castStringToNum(isNumber)),
-    [STRING_NUMBER_MAX]: isNillable(castStringToNum(isNumberMaxValid)),
-    [STRING_NUMBER_MIN]: isNillable(castStringToNum(isNumberMinValid)),
+    [ARRAY_LENGTH_MAX]: allowNil(isArrayMaxLenValid),
+    [ARRAY_LENGTH_MIN]: allowNil(isArrayMinLenValid),
+    [ARRAY_OBJECT]: allowNil(isObjectArray),
+    [ARRAY_PRIMITIVE]: allowNil(isPrimitiveArray),
+    [BOOLEAN]: allowNil(isBoolean),
+    [NUMBER]: allowNil(isNumber),
+    [NUMBER_MAX]: allowNil(isNumberMaxValid),
+    [NUMBER_MIN]: allowNil(isNumberMinValid),
+    [OBJECT]: allowNil(isObject),
+    [REQUIRED]: isNotNil,
+    [STRING]: allowNil(isString),
+    [STRING_LENGTH_MAX]: allowNil(isStringMaxLenValid),
+    [STRING_LENGTH_MIN]: allowNil(isStringMinLenValid),
+    [STRING_NUMBER]: allowNil(castStringToNum(isNumber)),
+    [STRING_NUMBER_MAX]: allowNil(castStringToNum(isNumberMaxValid)),
+    [STRING_NUMBER_MIN]: allowNil(castStringToNum(isNumberMinValid)),
   }
 
-  private exceptionKey = '__EXCEPTION__';
+  private exceptionKey = Symbol('exception');
 
-  private resolveErrorKey(validators: Validator[], value: any): string {
-    const errorKey = validators.reduce((result, params) => {
+  private resolveErrorKey(validators: Validator[], value: any): ValidatorKey {
+    const errorKey = validators.reduce((result: ValidatorKey | Symbol, params) => {
       if (result) {
         return result;
       }
@@ -91,10 +97,10 @@ class ValidationService {
       }
 
       return result;
-    }, '');
+    }, undefined);
 
     if (errorKey && errorKey !== this.exceptionKey) {
-      return errorKey;
+      return errorKey as ValidatorKey;
     }
 
     return undefined;
@@ -116,9 +122,15 @@ class ValidationService {
           return result;
         }
 
+        const { args } = schema[prop].find((v) => v.key === errorKey);
+
         return {
           ...result,
-          [prop]: errorKey,
+          [prop]: {
+            type: errorKey,
+            value: item[prop],
+            ...(args && { shouldMatch: args }),
+          },
         };
       }, {});
   }
@@ -144,10 +156,17 @@ class ValidationService {
       return;
     }
 
+    const { args } = validators.find((v) => v.key === errorKey);
+    const errorObject = {
+      type: errorKey,
+      value: item,
+      ...(args && { shouldMatch: args }),
+    };
+
     throw errorService.generate(
       StatusCodes.BAD_REQUEST,
       ERROR_CODES.INVALID_PARAMS,
-      errorKey,
+      errorObject,
     );
   }
 }

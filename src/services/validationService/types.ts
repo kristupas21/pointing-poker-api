@@ -15,4 +15,5 @@ export type ValidationSchema<T extends object> =
 
 export type ValidatorFn = (...args) => boolean;
 
-export type ValidationErrorObject<T extends object> = Record<keyof T, ValidatorKey> | {};
+export type ValidationErrorObject<T extends object> =
+    PartialRecord<keyof T, { type: ValidatorKey, value: any, shouldMatch?: any }>;

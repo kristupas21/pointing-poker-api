@@ -2,7 +2,7 @@ import _isArray from 'lodash/isArray';
 import _isPlainObject from 'lodash/isPlainObject';
 import { ValidatorFn } from '@services/validationService/types';
 
-export function isNillable(fn: ValidatorFn): ValidatorFn {
+export function allowNil(fn: ValidatorFn): ValidatorFn {
   return (...args) => isNil(args[0]) || fn(...args);
 }
 
@@ -13,7 +13,7 @@ export function castStringToNum(fn: ValidatorFn): ValidatorFn {
   };
 }
 
-export function isProvided(value: any): boolean {
+export function isNotNil(value: any): boolean {
   return value != null;
 }
 
@@ -22,7 +22,7 @@ export function isNil(value: any): boolean {
 }
 
 export function isString(value: any): boolean {
-  return typeof value === 'string' && isStringNotEmpty(value);
+  return typeof value === 'string' && value !== '' && value.trim() !== '';
 }
 
 export function isNumber(value: any): boolean {
@@ -31,10 +31,6 @@ export function isNumber(value: any): boolean {
       !Number.isNaN(value) &&
       value !== Infinity &&
       value !== -Infinity);
-}
-
-export function isStringNotEmpty(value: string): boolean {
-  return value !== '' && value.trim() !== '';
 }
 
 export function isStringMinLenValid(value: string, min: number): boolean {
@@ -71,4 +67,12 @@ export function isObject(value: any): boolean {
 
 export function isBoolean(value: any): boolean {
   return typeof value === 'boolean';
+}
+
+export function isArrayMinLenValid(value: any[], min: number): boolean {
+  return value.length >= min;
+}
+
+export function isArrayMaxLenValid(value: any[], max: number): boolean {
+  return value.length <= max;
 }
