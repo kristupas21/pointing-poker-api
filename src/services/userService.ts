@@ -32,6 +32,10 @@ class UserService {
     await User.updateMany({ registeredSessionId: sessionId }, { voteValue: null });
   }
 
+  public async updateAllUserPermissions(sessionId: string, value: boolean): Promise<void> {
+    await User.updateMany({ registeredSessionId: sessionId }, { sessionControlPermission: value });
+  }
+
   public async findUserById(sessionId: string, userId: string): Promise<UserSchema> {
     return User.findOne({ registeredSessionId: sessionId, id: userId });
   }
@@ -41,9 +45,13 @@ class UserService {
     return !!user;
   }
 
-  public async registerUser(sessionId: string, user: UserSchema): Promise<UserSchema> {
+  public async registerUser(
+    sessionId: string,
+    user: UserSchema,
+    sessionControlPermission: boolean
+  ): Promise<UserSchema> {
     const filter = { id: user.id, registeredSessionId: sessionId };
-    const userParams = { ...user, registeredSessionId: sessionId };
+    const userParams = { ...user, registeredSessionId: sessionId, sessionControlPermission };
 
     return User.updateOne(filter, userParams, { upsert: true, new: true }).lean();
   }

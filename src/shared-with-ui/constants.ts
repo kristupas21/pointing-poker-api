@@ -1,3 +1,5 @@
+import { UPDATE_VOTE_ROUND_USER_PERMISSIONS } from '../../../pointing-poker-ui/src/state/voteRound/voteRoundConstants';
+
 export const ERROR_CODES = {
   INTERNAL_SERVER: 'error.internalServer',
   MISSING_PARAM: 'error.missingParam',
@@ -17,6 +19,8 @@ export const WS_RESET_VOTE_ROUND = '@@ws/@voteRound/RESET';
 export const WS_SET_USER_VOTE_VALUE = '@@ws/@voteRound/SET_USER_VOTE_VALUE';
 export const WS_SET_VOTE_ROUND_TOPIC = '@@ws/@voteRound/SET_TOPIC';
 export const WS_MODIFY_SESSION_USER = '@@ws/@session/MODIFY_USER';
+export const WS_UPDATE_SESSION_PERMISSIONS ='@@ws/UPDATE_SESSION_PERMISSIONS';
+export const WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS = '@@ws/@voteRound/UPDATE_USER_PERMISSIONS';
 
 export const INPUT_MIN_CHARS = 2;
 export const INPUT_MAX_CHARS = 50;

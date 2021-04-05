@@ -6,7 +6,10 @@ import {
   WS_SHOW_VOTES,
   WS_USER_JOINED,
   WS_USER_LEFT,
-  WS_SET_VOTE_ROUND_TOPIC, WS_MODIFY_SESSION_USER
+  WS_SET_VOTE_ROUND_TOPIC,
+  WS_MODIFY_SESSION_USER,
+  WS_UPDATE_SESSION_PERMISSIONS,
+  WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS
 } from '@shared-with-ui/constants';
 import UserService from '@services/userService';
 import SessionService from '@services/sessionService';
@@ -57,29 +60,46 @@ class WsService {
     this.socket.on(WS_SET_VOTE_ROUND_TOPIC, this.handleSetVoteRoundTopic);
 
     this.socket.on(WS_MODIFY_SESSION_USER, this.handleModifySessionUser);
+
+    this.socket.on(WS_UPDATE_SESSION_PERMISSIONS, this.handleUpdateSessionPermissions);
+
+    this.socket.on(WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS, this.handleUpdateVoteRoundUserPermissions);
   }
 
-  private handleUserJoined = (message: WSMessage<{ user: UserSchema, sessionId: string }>) => {
+  private async shouldUpdateUserPermissions(userId: string): Promise<boolean> {
+    const user = await userService.findUserById(this.sessionId, userId);
+    const session = await sessionService.findSessionById(this.sessionId);
+
+    return user.id === session.createdBy && session.usePermissions;
+  }
+
+  private handleUserJoined = async (message: WSMessage<{ user: UserSchema, sessionId: string }>) => {
+    if (await this.shouldUpdateUserPermissions(message.body.user.id)) {
+      this.getBroadcast().emit(
+        WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS,
+        this.constructWsMessage({ sessionControlPermission: false })
+      );
+    }
+
     this.getBroadcast().emit(WS_USER_JOINED, message);
   }
 
   private handleShowVotes = async (message: WSMessage<{ user: UserSchema }>) => {
     await sessionService
-      .setSessionVoteStatus(this.sessionId, true);
+      .modifySessionParams(this.sessionId, { showVotes: true });
 
     this.getBroadcast().emit(WS_SHOW_VOTES, message);
   };
 
   private handleHideVotes = async (message: WSMessage<void>) => {
     await sessionService
-      .setSessionVoteStatus(this.sessionId, false);
+      .modifySessionParams(this.sessionId, { showVotes: false });
 
     this.getBroadcast().emit(WS_HIDE_VOTES, message);
   };
 
   private handleResetVoteRound = async (message: WSMessage<{ user: UserSchema }>) => {
-    await sessionService.setSessionVoteStatus(this.sessionId, false);
-    await sessionService.setSessionTopic(this.sessionId, '');
+    await sessionService.modifySessionParams(this.sessionId, { showVotes: false, currentTopic: '' });
     await userService.clearAllVoteValues(this.sessionId);
 
     this.getBroadcast().emit(WS_RESET_VOTE_ROUND, message);
@@ -93,7 +113,7 @@ class WsService {
   };
 
   private handleSetVoteRoundTopic = async (message: WSMessage<{ topic: string }>) => {
-    await sessionService.setSessionTopic(this.sessionId, message.body.topic);
+    await sessionService.modifySessionParams(this.sessionId, { currentTopic: message.body.topic });
 
     this.getBroadcast().emit(WS_SET_VOTE_ROUND_TOPIC, message);
   }
@@ -108,13 +128,34 @@ class WsService {
     this.getBroadcast().emit(WS_MODIFY_SESSION_USER, newMessage);
   }
 
+  private handleUpdateSessionPermissions = async (message: WSMessage<{ usePermissions: boolean }>) => {
+    await sessionService.modifySessionParams(
+      this.sessionId,
+      { usePermissions: message.body.usePermissions }
+    );
+
+    this.getBroadcast().emit(WS_UPDATE_SESSION_PERMISSIONS, message);
+  }
+
+  private handleUpdateVoteRoundUserPermissions = async (message: WSMessage<{ sessionControlPermission: boolean }>) => {
+    await userService.updateAllUserPermissions(this.sessionId, message.body.sessionControlPermission);
+
+    this.getBroadcast().emit(WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS, message);
+  }
+
   public async destroy(userId: string): Promise<void> {
+    if (await this.shouldUpdateUserPermissions(userId)) {
+      this.getBroadcast().emit(
+        WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS,
+        this.constructWsMessage({ sessionControlPermission: true })
+      );
+    }
+
     const user = await userService.findUserById(this.sessionId, userId);
-    const userLeftMessage = this.constructWsMessage({ user });
 
     await userService.removeUser(this.sessionId, userId);
 
-    this.getBroadcast().emit(WS_USER_LEFT, userLeftMessage);
+    this.getBroadcast().emit(WS_USER_LEFT, this.constructWsMessage({ user }));
 
     void this.socket.leave(this.roomName);
 

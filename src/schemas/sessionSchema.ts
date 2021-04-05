@@ -31,14 +31,25 @@ const Session = new Schema({
     required: false,
     default: [],
   },
+  createdBy: {
+    type: String,
+    required: true,
+  },
+  usePermissions: {
+    type: Boolean,
+    required: false,
+    default: false,
+  }
 });
 
 export interface SessionSchemaProps {
-  id: string;
+  createdBy: string;
   currentTopic: string;
+  id: string;
   pointValues: PointValue[];
   roles: string[];
   showVotes: boolean;
+  usePermissions?: boolean;
   useRoles: boolean;
 }
 

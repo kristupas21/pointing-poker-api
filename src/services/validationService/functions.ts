@@ -22,7 +22,7 @@ export function isNil(value: any): boolean {
 }
 
 export function isString(value: any): boolean {
-  return typeof value === 'string' && value !== '' && value.trim() !== '';
+  return typeof value === 'string';
 }
 
 export function isNumber(value: any): boolean {

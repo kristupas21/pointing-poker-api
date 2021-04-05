@@ -39,7 +39,9 @@ class SessionService {
       throw errorService.generate(StatusCodes.CONFLICT, ERROR_CODES.USER_NAME_EXISTS);
     }
 
-    return await userService.registerUser(sessionId, user);
+    const hasControlPermission = session.createdBy === user.id || !session.usePermissions;
+
+    return await userService.registerUser(sessionId, user, hasControlPermission);
   }
 
   public async loadSession(sessionId: string, userId: string): Promise<any> {
@@ -71,7 +73,7 @@ class SessionService {
   public async startSession(body: StartSessionBody): Promise<{ sessionId: string }> {
     validationService.validateBySchema(body, VALIDATION_SCHEMA.START_SESSION_BODY);
 
-    const { user, useRoles, pointValues, roles } = body;
+    const { user, useRoles, pointValues, roles, usePermissions } = body;
     const sessionId = this.generateSectionId();
 
     const sessionDB = new Session({
@@ -79,11 +81,14 @@ class SessionService {
       useRoles,
       pointValues,
       roles,
+      createdBy: user.id,
+      usePermissions,
     });
 
     const userDB = new User({
       ...user,
       registeredSessionId: sessionId,
+      sessionControlPermission: true,
     });
 
     await sessionDB.save();
@@ -92,21 +97,13 @@ class SessionService {
     return { sessionId };
   }
 
-  public async setSessionVoteStatus(
+  public async modifySessionParams(
     sessionId: string,
-    showVotes: boolean
+    params: Partial<SessionSchema>
   ): Promise<SessionSchema> {
     return Session.findOneAndUpdate(
       { id: sessionId },
-      { showVotes },
-      { useFindAndModify: true }
-    );
-  }
-
-  public async setSessionTopic(sessionId: string, currentTopic: string): Promise<SessionSchema> {
-    return Session.findOneAndUpdate(
-      { id: sessionId },
-      { currentTopic },
+      params,
       { useFindAndModify: true }
     );
   }
@@ -114,13 +111,17 @@ class SessionService {
   public async getSessionInfo(params: SessionInfoParams): Promise<SessionSchema> {
     validationService.validateBySchema(params, VALIDATION_SCHEMA.SESSION_INFO_PARAMS);
 
-    const session: SessionSchema = await Session.findOne({ id: params.sessionId }).lean();
+    const session = await this.findSessionById(params.sessionId);
 
     if (!session) {
       throw errorService.generate(StatusCodes.NOT_FOUND, ERROR_CODES.SESSION_NOT_FOUND);
     }
 
     return session;
+  }
+
+  public async findSessionById(id: string): Promise<SessionSchema> {
+    return Session.findOne({ id }).lean();
   }
 }
 

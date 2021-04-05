@@ -5,7 +5,7 @@ const User = new Schema({
   avatarId: {
     type: String,
     enum: Object.values(AvatarId),
-    required: false
+    required: true
   },
   id: {
     type: String,
@@ -19,6 +19,11 @@ const User = new Schema({
   name: {
     type: String,
     required: true
+  },
+  sessionControlPermission: {
+    type: Boolean,
+    required: false,
+    default: true,
   },
   role: {
     type: String,
@@ -37,12 +42,13 @@ const User = new Schema({
 });
 
 export interface UserSchemaProps {
-  avatarId?: AvatarId;
+  avatarId: AvatarId;
   id: string;
   isObserver?: boolean;
   name: string;
   role?: string;
   registeredSessionId?: string;
+  sessionControlPermission?: boolean;
   voteValue?: string;
 }
 

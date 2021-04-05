@@ -31,6 +31,9 @@ const START_SESSION_BODY: ValidationSchema<StartSessionBody> = {
     { key: ARRAY_PRIMITIVE, validators: [{ key: STRING }] },
     { key: ARRAY_LENGTH_MAX, args: [MAX_ROLES_COUNT]},
   ],
+  usePermissions: [
+    { key: BOOLEAN },
+  ],
 };
 
 export default START_SESSION_BODY;
