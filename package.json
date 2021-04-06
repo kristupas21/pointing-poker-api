@@ -43,6 +43,11 @@
       "project": "./tsconfig.json"
     },
     "rules": {
+      "no-multi-spaces": "error",
+      "keyword-spacing": "error",
+      "key-spacing": ["error", { "mode": "strict" }],
+      "space-unary-ops": "error",
+      "func-call-spacing": "error",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/indent": [
         "error",

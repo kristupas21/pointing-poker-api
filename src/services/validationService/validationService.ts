@@ -42,6 +42,7 @@ import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
 import ErrorService from '@services/errorService';
 import { Primitive } from '@shared-with-ui/types';
+import { ApiError } from '@services/errorService/types';
 
 const errorService = new ErrorService();
 
@@ -169,6 +170,18 @@ class ValidationService {
       errorObject,
     );
   }
+
+  public validateBySchemaNonBlocking<T extends object>(
+    item: T,
+    schema: ValidationSchema<T>
+  ): ApiError | void {
+    try {
+      return this.validateBySchema(item, schema);
+    } catch (e) {
+      return e as ApiError;
+    }
+  }
+
 }
 
 export default ValidationService;

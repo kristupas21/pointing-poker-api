@@ -1,3 +1,5 @@
+import { UserSchemaProps } from '@schemas/userSchema';
+
 export enum AvatarId {
   Demo1 = 'demo-1',
   Demo2 = 'demo-2',
@@ -18,3 +20,15 @@ export type Primitive = string | boolean | number;
 export type PartialRecord<K extends keyof any, T> = {
   [P in K]?: T;
 };
+
+export interface WSMessage<T extends object = {}> {
+  body: T;
+  sessionId: string;
+}
+
+export type WSMessageUserData = WSMessage<{ user: UserSchemaProps }>;
+export type WSMessageSetVoteValue = WSMessage<{ user: UserSchemaProps; voteValue: string }>;
+export type WSMessageSetTopic = WSMessage<{ topic: string }>;
+export type WSMessageModifyUser = WSMessage<{ params: Partial<UserSchemaProps>; userId: string }>;
+export type WSMessageSessionPermissions = WSMessage<{ usePermissions: boolean }>;
+export type WSMessageUserPermissions = WSMessage<{ hasPermission: boolean }>;

@@ -1,17 +1,10 @@
 import { ValidationSchema } from '@services/validationService/types';
 import { JoinSessionBody } from '@models/sessionModel';
-import { OBJECT, REQUIRED, STRING } from '@services/validationService/validatorKeys';
-import USER from '@services/validationService/validationSchemas/user';
+import commonValidationSchema from '@services/validationService/validationSchemas/common';
 
 const JOIN_SESSION_BODY: ValidationSchema<JoinSessionBody> = {
-  sessionId: [
-    { key: REQUIRED },
-    { key: STRING },
-  ],
-  user: [
-    { key: REQUIRED },
-    { key: OBJECT, schema: USER },
-  ],
+  ...commonValidationSchema.session,
+  ...commonValidationSchema.user,
 };
 
 export default JOIN_SESSION_BODY;

@@ -1,5 +1,3 @@
-import { UPDATE_VOTE_ROUND_USER_PERMISSIONS } from '../../../pointing-poker-ui/src/state/voteRound/voteRoundConstants';
-
 export const ERROR_CODES = {
   INTERNAL_SERVER: 'error.internalServer',
   MISSING_PARAM: 'error.missingParam',
@@ -11,6 +9,7 @@ export const ERROR_CODES = {
   INVALID_PARAMS: 'error.invalidParams',
 };
 
+export const WS_SOCKET_ERROR = '@@ws/SOCKET_ERROR';
 export const WS_USER_JOINED = '@@ws/USER_JOINED';
 export const WS_USER_LEFT = '@@ws/USER_LEFT';
 export const WS_SHOW_VOTES = '@@ws/@voteRound/SHOW_VOTES';
