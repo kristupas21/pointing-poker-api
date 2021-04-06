@@ -32,6 +32,9 @@ const USER: ValidationSchema<UserSchemaProps> = {
   voteValue: [
     { key: STRING },
   ],
+  hasPermission: [
+    { key: BOOLEAN },
+  ]
 };
 
 export default USER;

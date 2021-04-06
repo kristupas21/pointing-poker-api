@@ -20,7 +20,7 @@ const User = new Schema({
     type: String,
     required: true
   },
-  sessionControlPermission: {
+  hasPermission: {
     type: Boolean,
     required: false,
     default: true,
@@ -48,7 +48,7 @@ export interface UserSchemaProps {
   name: string;
   role?: string;
   registeredSessionId?: string;
-  sessionControlPermission?: boolean;
+  hasPermission?: boolean;
   voteValue?: string;
 }
 

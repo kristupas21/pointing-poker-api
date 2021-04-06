@@ -32,12 +32,12 @@ class UserService {
     await User.updateMany({ registeredSessionId: sessionId }, { voteValue: null });
   }
 
-  public async updateAllUserPermissions(sessionId: string, value: boolean): Promise<void> {
-    await User.updateMany({ registeredSessionId: sessionId }, { sessionControlPermission: value });
+  public async updateAllUserPermissions(sessionId: string, hasPermission: boolean): Promise<void> {
+    await User.updateMany({ registeredSessionId: sessionId }, { hasPermission });
   }
 
-  public async findUserById(sessionId: string, userId: string): Promise<UserSchema> {
-    return User.findOne({ registeredSessionId: sessionId, id: userId });
+  public async findUserById(sessionId: string, id: string): Promise<UserSchema> {
+    return User.findOne({ registeredSessionId: sessionId, id });
   }
 
   public async userNameExists(sessionId: string, name: string): Promise<boolean> {
@@ -45,15 +45,15 @@ class UserService {
     return !!user;
   }
 
-  public async registerUser(
-    sessionId: string,
-    user: UserSchema,
-    sessionControlPermission: boolean
-  ): Promise<UserSchema> {
+  public async registerUser(sessionId: string, user: UserSchema, hasPermission: boolean): Promise<UserSchema> {
     const filter = { id: user.id, registeredSessionId: sessionId };
-    const userParams = { ...user, registeredSessionId: sessionId, sessionControlPermission };
+    const userParams = { ...user, registeredSessionId: sessionId, hasPermission };
 
     return User.updateOne(filter, userParams, { upsert: true, new: true }).lean();
+  }
+
+  public async findAllSessionUsers(sessionId: string): Promise<UserSchema[]> {
+    return User.find({ registeredSessionId: sessionId }).lean();
   }
 }
 

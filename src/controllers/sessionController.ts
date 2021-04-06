@@ -39,8 +39,8 @@ export const loadSessionController = async (req: AppRequest<null, LoadSessionQue
 
 export const startSessionController = async (req: AppRequest<StartSessionBody>, res: Response) => {
   try {
-    const response = await sessionService.startSession(req.body);
-    return res.status(StatusCodes.CREATED).json({ ...response });
+    const sessionId = await sessionService.startSession(req.body);
+    return res.status(StatusCodes.CREATED).json({ sessionId });
   } catch (e) {
     const { status, error } = errorService.parse(e);
     return res.status(status).json(error);

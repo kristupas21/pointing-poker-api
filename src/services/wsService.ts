@@ -63,10 +63,10 @@ class WsService {
 
     this.socket.on(WS_UPDATE_SESSION_PERMISSIONS, this.handleUpdateSessionPermissions);
 
-    this.socket.on(WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS, this.handleUpdateVoteRoundUserPermissions);
+    this.socket.on(WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS, this.handleUpdateUserPermissions);
   }
 
-  private async shouldUpdateUserPermissions(userId: string): Promise<boolean> {
+  private async shouldUpdateUserPermission(userId: string): Promise<boolean> {
     const user = await userService.findUserById(this.sessionId, userId);
     const session = await sessionService.findSessionById(this.sessionId);
 
@@ -74,10 +74,10 @@ class WsService {
   }
 
   private handleUserJoined = async (message: WSMessage<{ user: UserSchema, sessionId: string }>) => {
-    if (await this.shouldUpdateUserPermissions(message.body.user.id)) {
+    if (await this.shouldUpdateUserPermission(message.body.user.id)) {
       this.getBroadcast().emit(
         WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS,
-        this.constructWsMessage({ sessionControlPermission: false })
+        this.constructWsMessage({ hasPermission: false })
       );
     }
 
@@ -113,7 +113,8 @@ class WsService {
   };
 
   private handleSetVoteRoundTopic = async (message: WSMessage<{ topic: string }>) => {
-    await sessionService.modifySessionParams(this.sessionId, { currentTopic: message.body.topic });
+    await sessionService
+      .modifySessionParams(this.sessionId, { currentTopic: message.body.topic });
 
     this.getBroadcast().emit(WS_SET_VOTE_ROUND_TOPIC, message);
   }
@@ -137,17 +138,18 @@ class WsService {
     this.getBroadcast().emit(WS_UPDATE_SESSION_PERMISSIONS, message);
   }
 
-  private handleUpdateVoteRoundUserPermissions = async (message: WSMessage<{ sessionControlPermission: boolean }>) => {
-    await userService.updateAllUserPermissions(this.sessionId, message.body.sessionControlPermission);
+  private handleUpdateUserPermissions = async (message: WSMessage<{ hasPermission: boolean }>) => {
+    await userService
+      .updateAllUserPermissions(this.sessionId, message.body.hasPermission);
 
     this.getBroadcast().emit(WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS, message);
   }
 
   public async destroy(userId: string): Promise<void> {
-    if (await this.shouldUpdateUserPermissions(userId)) {
+    if (await this.shouldUpdateUserPermission(userId)) {
       this.getBroadcast().emit(
         WS_UPDATE_VOTE_ROUND_USER_PERMISSIONS,
-        this.constructWsMessage({ sessionControlPermission: true })
+        this.constructWsMessage({ hasPermission: true })
       );
     }
 

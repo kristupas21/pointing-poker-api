@@ -1,7 +1,7 @@
 import { IdGenerator, JoinSessionBody, SessionInfoParams, StartSessionBody } from '@models/sessionModel';
 import shortid from 'shortid';
 import Session, { SessionSchema } from '@schemas/sessionSchema';
-import User, { UserSchema } from '@schemas/userSchema';
+import { UserSchema } from '@schemas/userSchema';
 import { ID_GEN_ALLOWED_CHARS } from '@global/constants';
 import { ERROR_CODES } from '@shared-with-ui/constants';
 import StatusCodes from 'http-status-codes';
@@ -25,11 +25,31 @@ class SessionService {
     return this.idGenerator.generate();
   }
 
+  private async registerNewSession(params: Partial<SessionSchema>): Promise<string> {
+    const sessionId = this.generateSectionId();
+    const session = new Session({
+      id: sessionId,
+      ...params,
+    });
+
+    await session.save();
+
+    return sessionId;
+  }
+
+  public async findSessionById(id: string): Promise<SessionSchema> {
+    return Session.findOne({ id }).lean();
+  }
+
+  public async modifySessionParams(id: string, params: Partial<SessionSchema>): Promise<SessionSchema> {
+    return Session.findOneAndUpdate({ id }, params, { useFindAndModify: true });
+  }
+
   public async joinSession(body: JoinSessionBody): Promise<UserSchema> {
     validationService.validateBySchema(body, VALIDATION_SCHEMA.JOIN_SESSION_BODY);
 
     const { sessionId, user } = body;
-    const session: SessionSchema = await Session.findOne({ id: sessionId }).lean();
+    const session = await this.findSessionById(sessionId);
 
     if (!session) {
       throw errorService.generate(StatusCodes.NOT_FOUND, ERROR_CODES.SESSION_NOT_FOUND);
@@ -39,9 +59,9 @@ class SessionService {
       throw errorService.generate(StatusCodes.CONFLICT, ERROR_CODES.USER_NAME_EXISTS);
     }
 
-    const hasControlPermission = session.createdBy === user.id || !session.usePermissions;
+    const hasPermission = session.createdBy === user.id || !session.usePermissions;
 
-    return await userService.registerUser(sessionId, user, hasControlPermission);
+    return await userService.registerUser(sessionId, user, hasPermission);
   }
 
   public async loadSession(sessionId: string, userId: string): Promise<any> {
@@ -50,7 +70,7 @@ class SessionService {
       VALIDATION_SCHEMA.LOAD_SESSION_PARAMS
     );
 
-    const session = await Session.findOne({ id: sessionId }).lean();
+    const session = await this.findSessionById(sessionId);
 
     if (!session) {
       throw errorService.generate(
@@ -60,7 +80,7 @@ class SessionService {
       );
     }
 
-    const users = await User.find({ registeredSessionId: sessionId }).lean();
+    const users = await userService.findAllSessionUsers(sessionId);
     const userExists = users.some((user) => user.id === userId);
 
     if (!userExists) {
@@ -70,42 +90,22 @@ class SessionService {
     return { ...session, users };
   }
 
-  public async startSession(body: StartSessionBody): Promise<{ sessionId: string }> {
+  public async startSession(body: StartSessionBody): Promise<string> {
     validationService.validateBySchema(body, VALIDATION_SCHEMA.START_SESSION_BODY);
 
     const { user, useRoles, pointValues, roles, usePermissions } = body;
-    const sessionId = this.generateSectionId();
-
-    const sessionDB = new Session({
-      id: sessionId,
+    const sessionParams = {
       useRoles,
       pointValues,
       roles,
       createdBy: user.id,
       usePermissions,
-    });
+    };
+    const sessionId = await this.registerNewSession(sessionParams);
 
-    const userDB = new User({
-      ...user,
-      registeredSessionId: sessionId,
-      sessionControlPermission: true,
-    });
+    await userService.registerUser(sessionId, user, true);
 
-    await sessionDB.save();
-    await userDB.save();
-
-    return { sessionId };
-  }
-
-  public async modifySessionParams(
-    sessionId: string,
-    params: Partial<SessionSchema>
-  ): Promise<SessionSchema> {
-    return Session.findOneAndUpdate(
-      { id: sessionId },
-      params,
-      { useFindAndModify: true }
-    );
+    return sessionId;
   }
 
   public async getSessionInfo(params: SessionInfoParams): Promise<SessionSchema> {
@@ -118,10 +118,6 @@ class SessionService {
     }
 
     return session;
-  }
-
-  public async findSessionById(id: string): Promise<SessionSchema> {
-    return Session.findOne({ id }).lean();
   }
 }
 
